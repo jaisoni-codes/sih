@@ -200,6 +200,15 @@ export const GovtAdminPortalPage: React.FC = () => {
                   <div className="flex justify-between items-start pb-2 border-b border-slate-100">
                     <div className="flex items-center space-x-2">
                       <span className="font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{p.ticketNumber}</span>
+                      {p.source === "whatsapp" ? (
+                        <span className="inline-flex items-center space-x-1 text-[11px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                          <span>💬 WhatsApp</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center space-x-1 text-[11px] font-semibold bg-blue-50 text-blue-800 px-2 py-0.5 rounded border border-blue-200">
+                          <span>🌐 Portal</span>
+                        </span>
+                      )}
                       <StatusPill status={p.status} />
                       <span className="text-slate-500">District: {p.district}</span>
                     </div>

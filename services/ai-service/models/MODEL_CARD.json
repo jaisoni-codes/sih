@@ -1,0 +1,8 @@
+{
+  "text_model": "models/jsicp_text_classifier.joblib",
+  "priority_model": "models/priority_model.joblib",
+  "text_training_rows": 8892,
+  "hard_test_accuracy": 0.9066666666666666,
+  "real_external_rows_embedded": 0,
+  "reason": "External bulk downloads unavailable in this runtime; reproducible source adapters included."
+}

@@ -481,3 +481,203 @@ export const getAiRoutingRecommendations = (
     }
   ];
 };
+
+export interface DomainVerificationDetails {
+  nlpKeywords: string[];
+  cvSceneTags: string[];
+  validationLabel: string;
+}
+
+export const getDomainKeywordsAndTags = (
+  category: string = "Water Resources & Sanitation",
+  title: string = "",
+  description: string = "",
+  district: string = "Ranchi",
+  block?: string
+): DomainVerificationDetails => {
+  const combined = `${title} ${description} ${category}`.toLowerCase();
+  const locTag = (block || district || "Ranchi").toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+  // 1. Water Resources & Sanitation
+  if (
+    category === "Water Resources & Sanitation" ||
+    combined.includes("water") ||
+    combined.includes("pani") ||
+    combined.includes("handpump") ||
+    combined.includes("jal") ||
+    combined.includes("shortage") ||
+    combined.includes("borewell") ||
+    combined.includes("fluoride") ||
+    combined.includes("arsenic") ||
+    combined.includes("tap") ||
+    combined.includes("pipeline")
+  ) {
+    const isContaminated =
+      combined.includes("fluoride") ||
+      combined.includes("arsenic") ||
+      combined.includes("dirty") ||
+      combined.includes("ganda") ||
+      combined.includes("contamination");
+    return {
+      nlpKeywords: [
+        isContaminated ? "water_contamination" : "water_scarcity",
+        "drinking_water",
+        "community_supply",
+        "borewell_handpump",
+        locTag
+      ],
+      cvSceneTags: [
+        "water source verified",
+        isContaminated ? "turbidity & contamination detected" : "potable water shortage verified",
+        "ground supply anomaly"
+      ],
+      validationLabel: "Verified Water Resources & Supply Issue"
+    };
+  }
+
+  // 2. Healthcare & MedTech
+  if (
+    category === "Healthcare & MedTech" ||
+    combined.includes("fever") ||
+    combined.includes("disease") ||
+    combined.includes("flu") ||
+    combined.includes("virus") ||
+    combined.includes("hospital") ||
+    combined.includes("doctor") ||
+    combined.includes("bimar") ||
+    combined.includes("weakness") ||
+    combined.includes("kamzori") ||
+    combined.includes("kuposhan") ||
+    combined.includes("malnutrition") ||
+    combined.includes("ilaj") ||
+    combined.includes("dawa") ||
+    combined.includes("health")
+  ) {
+    const kws = ["public_health", "medical_facility", "primary_health_centre", "clinical_demand", locTag];
+    if (combined.includes("weakness") || combined.includes("kamzori") || combined.includes("kuposhan") || combined.includes("malnutrition")) {
+      kws[1] = "community_weakness_alert";
+      kws[3] = "nutrition_vitality_deficit";
+    } else if (combined.includes("fever") || combined.includes("bukhar") || combined.includes("virus")) {
+      kws[1] = "fever_epidemic_alert";
+    }
+    return {
+      nlpKeywords: kws,
+      cvSceneTags: ["clinical symptom pattern verified", "community health demand", "medical facility deficit"],
+      validationLabel: "Verified Public Health & Clinical Challenge"
+    };
+  }
+
+  // 3. Rural Infrastructure & Transport
+  if (
+    category === "Rural Infrastructure & Transport" ||
+    combined.includes("road") ||
+    combined.includes("sadak") ||
+    combined.includes("bridge") ||
+    combined.includes("pul") ||
+    combined.includes("pothole") ||
+    combined.includes("khadde") ||
+    combined.includes("khadda") ||
+    combined.includes("gaddha") ||
+    combined.includes("transport")
+  ) {
+    const kws = ["rural_road", "potholes_damage", "culvert_bridge", "connectivity_issue", locTag];
+    if (combined.includes("khadde") || combined.includes("khadda")) {
+      kws[1] = "road_khadde_potholes";
+    }
+    return {
+      nlpKeywords: kws,
+      cvSceneTags: ["road surface erosion verified", "pothole / culvert defect", "transit hazard detected"],
+      validationLabel: "Verified Rural Infrastructure & Transport Defect"
+    };
+  }
+
+  // 4. Agriculture & Allied Technologies
+  if (
+    category === "Agriculture & Allied Technologies" ||
+    combined.includes("crop") ||
+    combined.includes("fasal") ||
+    combined.includes("kisan") ||
+    combined.includes("irrigation") ||
+    combined.includes("soil") ||
+    combined.includes("drought")
+  ) {
+    return {
+      nlpKeywords: ["crop_health", "irrigation_need", "soil_fertility", "farmer_livelihood", locTag],
+      cvSceneTags: ["crop stress verified", "irrigation system anomaly", "agricultural impact identified"],
+      validationLabel: "Verified Agricultural & Irrigation Challenge"
+    };
+  }
+
+  // 5. Renewable Energy & Off-Grid Power
+  if (
+    category === "Renewable Energy & Off-Grid Power" ||
+    combined.includes("solar") ||
+    combined.includes("power") ||
+    combined.includes("bijli") ||
+    combined.includes("electric") ||
+    combined.includes("transformer")
+  ) {
+    return {
+      nlpKeywords: ["power_outage", "solar_microgrid", "transformer_fault", "electricity_supply", locTag],
+      cvSceneTags: ["electrical line / transformer anomaly", "solar generation deficit", "power supply disrupted"],
+      validationLabel: "Verified Renewable Energy & Power Supply Issue"
+    };
+  }
+
+  // 6. Education & Smart Learning
+  if (
+    category === "Education & Smart Learning" ||
+    combined.includes("school") ||
+    combined.includes("student") ||
+    combined.includes("teacher") ||
+    combined.includes("padhai") ||
+    combined.includes("classroom")
+  ) {
+    return {
+      nlpKeywords: ["school_facility", "digital_classroom", "student_welfare", "teacher_shortage", locTag],
+      cvSceneTags: ["classroom infrastructure need", "school learning facility defect", "educational resource deficit"],
+      validationLabel: "Verified Education & School Facility Issue"
+    };
+  }
+
+  // 7. Environment & Mining Remediation
+  if (
+    category === "Environment & Mining Remediation" ||
+    combined.includes("mining") ||
+    combined.includes("coal") ||
+    combined.includes("koyla") ||
+    combined.includes("subsidence") ||
+    combined.includes("methane") ||
+    combined.includes("pollution")
+  ) {
+    return {
+      nlpKeywords: ["coal_seam_fire", "mining_subsidence", "methane_hazard", "environmental_remediation", locTag],
+      cvSceneTags: ["ground fissure / subsidence verified", "smoke & dust emission pattern", "mining zone hazard"],
+      validationLabel: "Verified Environmental & Mining Hazard"
+    };
+  }
+
+  // 8. Forest & Tribal Livelihoods
+  if (
+    category === "Forest & Tribal Livelihoods" ||
+    combined.includes("tribal") ||
+    combined.includes("forest") ||
+    combined.includes("jungle") ||
+    combined.includes("lac") ||
+    combined.includes("mahua") ||
+    combined.includes("artisan")
+  ) {
+    return {
+      nlpKeywords: ["tribal_livelihood", "minor_forest_produce", "lac_processing", "mahua_storage", locTag],
+      cvSceneTags: ["forest produce cluster verified", "tribal artisan processing unit", "rural forest livelihood support"],
+      validationLabel: "Verified Tribal Livelihood & Forest Produce Challenge"
+    };
+  }
+
+  // Default fallback
+  return {
+    nlpKeywords: ["civic_challenge", "community_welfare", "public_service", "local_development", locTag],
+    cvSceneTags: ["civic issue verified", "community impact verified", "field report authenticated"],
+    validationLabel: "Verified Civic Challenge"
+  };
+};

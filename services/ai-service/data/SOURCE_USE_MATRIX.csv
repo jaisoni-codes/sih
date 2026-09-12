@@ -1,0 +1,13 @@
+source,data_used,feature_role,implementation
+NYC 311,Text/agency/status/geo,taxonomy + routing + duplicate/temporal patterns,download_public_sources.py
+Chicago 311,Text/geo/status/duplicate fields,cross-city civic language + duplicate/status/geo patterns,download_public_sources.py
+CivicDex,multilingual intent/category/urgency,language robustness + civic taxonomy,download_public_sources.py
+RDD2022,road images/labels,future CV road damage weights,docs/CV_DATA_GUIDE.md
+TACO,trash images/labels,future waste detection weights,docs/CV_DATA_GUIDE.md
+Civic Issue Detection,garbage/pothole/manhole/road boxes,future civic CV weights,docs/CV_DATA_GUIDE.md
+AISHE,institution inventory,university list/enrichment,docs/UNIVERSITY_ROUTING_GUIDE.md
+OpenAlex,works/topics/institutions,research-expertise vectors,docs/UNIVERSITY_ROUTING_GUIDE.md
+IndicVoices,speech/text,future voice-to-text/ASR,docs/VOICE_GUIDE.md
+NITI Aayog/Jharkhand context,district vulnerability,priority calibration only,docs/JHARKHAND_DATA_GUIDE.md
+Jharkhand GIS,geo/infrastructure layers,location-aware routing/context,docs/JHARKHAND_DATA_GUIDE.md
+Synthetic Jharkhand,localized text,offline prototype coverage,data/synthetic_jharkhand_fusion.csv

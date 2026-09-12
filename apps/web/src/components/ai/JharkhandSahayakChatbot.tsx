@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   Mic
 } from "lucide-react";
+import { aiEngine } from "../../services/aiEngine";
 
 export const JharkhandSahayakChatbot: React.FC = () => {
   const { chatbotOpen, setChatbotOpen, problems, currentUser } = useApp();
@@ -48,7 +49,7 @@ export const JharkhandSahayakChatbot: React.FC = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInputMessage("");
 
-    setTimeout(() => {
+    setTimeout(async () => {
       let botReply = "";
       const lower = query.toLowerCase();
 
@@ -70,8 +71,9 @@ export const JharkhandSahayakChatbot: React.FC = () => {
       } else if (lower.includes("status") || lower.includes("track")) {
         const myProb = problems.find((p) => p.submittedBy === currentUser.id) || problems[0];
         botReply = `Your latest submitted challenge "${myProb.title}" is currently in status: [${myProb.status.toUpperCase()}]. Track all updates in the My Challenges tab.`;
-      } else {
-        botReply = "Thank you for your query. JSICP connects citizens, universities, and industry across all 24 districts of Jharkhand. You can submit civic problems, collaborate on multidisciplinary engineering solutions, and monitor real-time impact on the Government Analytics Dashboard.";
+        // Dynamic response from JSICP AI assistant
+        const reply = await aiEngine.askChatbot(query);
+        botReply = `🤖 ${reply}`;
       }
 
       setMessages((prev) => [
@@ -82,7 +84,7 @@ export const JharkhandSahayakChatbot: React.FC = () => {
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         }
       ]);
-    }, 600);
+    }, 400);
   };
 
   return (

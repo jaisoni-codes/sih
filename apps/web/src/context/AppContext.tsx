@@ -19,7 +19,7 @@ import {
   StudentDeliverableTask
 } from "../types";
 import { useAuth } from "./AuthContext";
-import { getAiRoutingRecommendations } from "../data/universityEcosystems";
+import { getAiRoutingRecommendations, getDomainKeywordsAndTags } from "../data/universityEcosystems";
 import {
   MOCK_USERS,
   MOCK_PROBLEMS,
@@ -96,6 +96,8 @@ export interface AppContextType {
   
   chatbotOpen: boolean;
   setChatbotOpen: (open: boolean) => void;
+  whatsappSimulatorOpen: boolean;
+  setWhatsappSimulatorOpen: (open: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -350,11 +352,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [blockchainLedger, setBlockchainLedger] = useState<BlockchainLedgerBlock[]>(MOCK_BLOCKCHAIN_LEDGER);
   const [districts] = useState<DistrictGeoData[]>(JHARKHAND_DISTRICTS);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("all");
-  const [currentLanguage, setCurrentLanguage] = useState<"en" | "hi" | "nagpuri" | "santali">("en");
+  const [currentLanguage, setCurrentLanguageState] = useState<"en" | "hi" | "nagpuri" | "santali">(() => {
+    return (localStorage.getItem("jsicp_lang") as any) || "en";
+  });
+  const setCurrentLanguage = (lang: "en" | "hi" | "nagpuri" | "santali") => {
+    setCurrentLanguageState(lang);
+    localStorage.setItem("jsicp_lang", lang);
+  };
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [offlineQueue, setOfflineQueue] = useState<any[]>([]);
   const [inspectingProblem, setInspectingProblem] = useState<Problem | null>(null);
   const [chatbotOpen, setChatbotOpen] = useState<boolean>(false);
+  const [whatsappSimulatorOpen, setWhatsappSimulatorOpen] = useState<boolean>(false);
 
 
   // Self-heal any existing or persisted problems in state so Healthcare/fever problems route to AIIMS Deoghar
@@ -463,24 +472,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       newProb.district || currentUser.district || "Ranchi"
     );
 
-    const isMining = category === "Environment & Mining Remediation";
-    const isAgri = category === "Agriculture & Allied Technologies" || category === "Forest & Tribal Livelihoods";
-
-    const nlpKeywords = isHealthDetected
-      ? ["fever", "epidemic", "viral_outbreak", "public_health", newProb.district || "Ranchi"]
-      : isMining
-      ? ["mining", "coal", "methane", "subsidence", newProb.district || "Dhanbad"]
-      : isAgri
-      ? ["agriculture", "soil", "crop_yield", "tribal_produce", newProb.district || "Khunti"]
-      : ["infrastructure", "community", "remediation", "Jharkhand", newProb.district || "Ranchi"];
-
-    const cvSceneTags = isHealthDetected
-      ? ["clinical anomaly", "patient surge", "syndromic cluster"]
-      : isMining
-      ? ["smoke vents", "ground fissure", "mine dump"]
-      : isAgri
-      ? ["crop inspection", "soil moisture", "harvest anomaly"]
-      : ["infrastructure defect", "public utility", "anomaly"];
+    const { nlpKeywords, cvSceneTags, validationLabel } = getDomainKeywordsAndTags(
+      category,
+      newProb.title || "",
+      newProb.description || "",
+      newProb.district || currentUser.district || "Ranchi",
+      newProb.block
+    );
     
     // Simulate AI pipeline
     const prob: Problem = {
@@ -495,8 +493,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       detectedLanguage: currentLanguage === "hi" ? "Hindi (hi)" : currentLanguage === "nagpuri" ? "Nagpuri (nag)" : "English (en)",
       category: category,
       subCategory: newProb.subCategory || "Community Scale Intervention",
-      categoryConfidence: 0.96,
-      priorityScore: Math.round((75 + Math.random() * 23) * 10) / 10,
+      categoryConfidence: newProb.categoryConfidence !== undefined ? newProb.categoryConfidence : 0.96,
+      priorityScore: newProb.priorityScore !== undefined ? newProb.priorityScore : Math.round((75 + Math.random() * 23) * 10) / 10,
       status: "pending_nodal_review",
       district: newProb.district || currentUser.district || "Ranchi",
       block: newProb.block || "Sadar Block",
@@ -505,7 +503,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       longitude: newProb.longitude || 85.3096,
       isDuplicateOf: null,
       citizenSupportCount: 1,
-      sdgTags: [
+      sdgTags: newProb.sdgTags && newProb.sdgTags.length > 0 ? newProb.sdgTags : [
         category.includes("Health")
           ? "SDG 3: Good Health & Well-Being"
           : category.includes("Water")
@@ -515,19 +513,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           : "SDG 11: Sustainable Cities",
         "SDG 9: Innovation & Infrastructure"
       ],
-      media: newProb.media || [
-        {
-          id: `med-${Date.now()}`,
-          problemId: `prob-${Date.now()}`,
-          mediaType: "image",
-          storageUrl: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=600&auto=format&fit=crop&q=80",
-          cvValidationLabel: isHealthDetected
-            ? "Verified Clinical / Public Health Anomaly (95% confidence)"
-            : "Verified Civic Infrastructure Anomaly (93% confidence)",
-          cvValidationConfidence: 0.95
-        }
-      ],
-      aiExplanation: {
+      media: newProb.media && newProb.media.length > 0 ? newProb.media : [],
+      aiExplanation: newProb.aiExplanation || {
         nlpKeywords,
         cvSceneTags,
         duplicateCheckResult: isHealthDetected
@@ -541,6 +528,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         },
         suggestedUniversities: aiRecs
       },
+      source: newProb.source || "website",
+      validationStatus: newProb.validationStatus || "valid",
+      originalVoiceTranscription: newProb.originalVoiceTranscription,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -1247,7 +1237,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         inspectingProblem,
         setInspectingProblem,
         chatbotOpen,
-        setChatbotOpen
+        setChatbotOpen,
+        whatsappSimulatorOpen,
+        setWhatsappSimulatorOpen
       }}
     >
       {children}

@@ -1,0 +1,10 @@
+{
+  "validation_accuracy": 1.0,
+  "validation_macro_f1": 1.0,
+  "hard_test_accuracy": 0.9066666666666666,
+  "hard_test_macro_f1": 0.9060057442788495,
+  "train_rows": 8892,
+  "validation_rows": 988,
+  "hard_test_rows": 1200,
+  "warning": "Synthetic/public-schema-inspired prototype data; metrics are not real-world performance."
+}

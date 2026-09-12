@@ -116,6 +116,15 @@ export const MyProblemsPage: React.FC = () => {
                   <span className="font-mono font-bold text-xs bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg">
                     {prob.ticketNumber}
                   </span>
+                  {prob.source === "whatsapp" ? (
+                    <span className="inline-flex items-center space-x-1 text-xs font-semibold bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200">
+                      <span>💬 WhatsApp</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center space-x-1 text-xs font-semibold bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200">
+                      <span>🌐 Portal</span>
+                    </span>
+                  )}
                   <StatusPill status={prob.status} />
                   <span className="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-lg flex items-center space-x-1">
                     <MapPin className="w-3.5 h-3.5 text-emerald-600" />

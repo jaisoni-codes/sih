@@ -5,6 +5,7 @@ import { AppProvider } from "./context/AppContext";
 import { GovtHeader } from "./components/layout/GovtHeader";
 import { GovtFooter } from "./components/layout/GovtFooter";
 import { JharkhandSahayakChatbot } from "./components/ai/JharkhandSahayakChatbot";
+import { WhatsAppSimulatorModal } from "./components/whatsapp/WhatsAppSimulatorModal";
 
 // Public Pages
 import { LandingPage } from "./pages/public/LandingPage";
@@ -62,6 +63,7 @@ export const App: React.FC = () => {
 
             <GovtFooter />
             <JharkhandSahayakChatbot />
+            <WhatsAppSimulatorModal />
           </div>
         </Router>
       </AppProvider>

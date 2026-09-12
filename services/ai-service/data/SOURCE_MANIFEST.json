@@ -1,0 +1,86 @@
+[
+  {
+    "name": "NYC 311 Service Requests",
+    "type": "text+geo+status",
+    "use": "complaint taxonomy, agency mapping, service status, geospatial/temporal patterns, duplicate/status features",
+    "access": "public API",
+    "url": "https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9"
+  },
+  {
+    "name": "Chicago 311 Service Requests",
+    "type": "text+geo+status",
+    "use": "cross-city civic language, service categories, duplicate/status and geospatial patterns",
+    "access": "public API",
+    "url": "https://data.cityofchicago.org/d/v6vf-nfxy"
+  },
+  {
+    "name": "CivicDex",
+    "type": "multilingual text",
+    "use": "multilingual intent/category/urgency/department supervision; Tamil/Tanglish/code-mixed robustness",
+    "access": "Hugging Face, MIT",
+    "url": "https://huggingface.co/datasets/JadeSamLee/civicdex"
+  },
+  {
+    "name": "RDD2022",
+    "type": "images",
+    "use": "road damage CV: pothole, longitudinal/transverse/alligator cracks",
+    "access": "Figshare, CC BY 4.0",
+    "url": "https://figshare.com/articles/dataset/RDD2022_-_The_multi-national_Road_Damage_Dataset_released_through_CRDDC_2022/21431547"
+  },
+  {
+    "name": "Civic Issue Detection Dataset",
+    "type": "images+boxes",
+    "use": "garbage, cracks, roads, manholes, potholes visual validation",
+    "access": "GitHub; check repository terms",
+    "url": "https://github.com/Sshanu/civic_issue_dataset"
+  },
+  {
+    "name": "TACO",
+    "type": "trash images+annotations",
+    "use": "waste/garbage detection and visual issue validation",
+    "access": "CC BY 4.0",
+    "url": "https://tacodataset.org/"
+  },
+  {
+    "name": "AISHE Higher Education Institution Directory",
+    "type": "institution metadata",
+    "use": "Jharkhand university/institution inventory and types",
+    "access": "Government of India",
+    "url": "https://dashboard.aishe.gov.in/"
+  },
+  {
+    "name": "OpenAlex",
+    "type": "research graph",
+    "use": "university expertise from works/topics/fields; routing ranking enrichment",
+    "access": "CC0 API",
+    "url": "https://openalex.org/"
+  },
+  {
+    "name": "IndicVoices",
+    "type": "speech+text",
+    "use": "regional-language voice/ASR extension including Santali",
+    "access": "CC BY 4.0, gated",
+    "url": "https://huggingface.co/datasets/ai4bharat/IndicVoices"
+  },
+  {
+    "name": "NITI Aayog Jharkhand MPI",
+    "type": "district context",
+    "use": "vulnerability context for priority calibration; not complaint text",
+    "access": "public report",
+    "url": "https://www.niti.gov.in/"
+  },
+  {
+    "name": "Jharkhand GIS",
+    "type": "geospatial context",
+    "use": "district/location context and infrastructure layers",
+    "access": "public portal",
+    "url": "https://gis.jharkhand.gov.in/"
+  },
+  {
+    "name": "Synthetic Jharkhand Fusion",
+    "type": "synthetic text",
+    "use": "Jharkhand-local language/category coverage where public grievance text is unavailable",
+    "access": "generated for prototype",
+    "url": ""
+  }
+]

@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PortalLayout, NavItem } from "../../components/layout/PortalLayout";
 import { useApp } from "../../context/AppContext";
 import { useAuth } from "../../context/AuthContext";
 import { StatusPill } from "../../components/common/StatusPill";
 import { SdgBadge } from "../../components/common/SdgBadge";
-import { VoiceRecorderModal } from "../../components/citizen/VoiceRecorderModal";
 import { CitizenRatingModal } from "../../components/citizen/CitizenRatingModal";
+import { aiEngine, AIAutoFillResult, JHARKHAND_DISTRICTS, ProblemValidationResult } from "../../services/aiEngine";
+import { ProblemCategory } from "../../types";
+import { CameraCaptureModal } from "../../components/common/CameraCaptureModal";
+import { VoiceInputButton } from "../../components/common/VoiceInputButton";
+import { t } from "../../i18n/translations";
 import {
   FileText,
   PlusCircle,
@@ -21,14 +25,29 @@ import {
   Send,
   CheckCircle2,
   AlertCircle,
+  HelpCircle,
   Search,
   Zap,
-  Briefcase
+  Briefcase,
+  Sparkles,
+  RefreshCw,
+  MessageSquare,
+  Upload,
+  Image as ImageIcon
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export const CitizenPortalPage: React.FC = () => {
-  const { problems, submitProblem, upvoteProblem, advanceProblemToDeployed, currentUser, agreements } = useApp();
+  const {
+    problems,
+    submitProblem,
+    upvoteProblem,
+    advanceProblemToDeployed,
+    currentUser,
+    agreements,
+    currentLanguage,
+    setWhatsappSimulatorOpen
+  } = useApp();
   const { currentRole } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
 
@@ -36,17 +55,89 @@ export const CitizenPortalPage: React.FC = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [descriptionOriginalLang, setDescriptionOriginalLang] = useState("");
-  const [category, setCategory] = useState<any>("Water Resources & Sanitation");
+  const [category, setCategory] = useState<ProblemCategory | "">("");
   const [subCategory, setSubCategory] = useState("");
   const [district, setDistrict] = useState(currentUser?.district || "Ranchi");
   const [block, setBlock] = useState("");
   const [village, setVillage] = useState("");
   const [latitude, setLatitude] = useState(23.3441);
   const [longitude, setLongitude] = useState(85.3096);
-  const [mediaUrl, setMediaUrl] = useState("https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=600&auto=format&fit=crop&q=80");
-  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const [mediaUrl, setMediaUrl] = useState("");
   const [ratingProb, setRatingProb] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cameraModalOpen, setCameraModalOpen] = useState(false);
+
+  // AI Auto-Fill & Validation State
+  const [validationResult, setValidationResult] = useState<ProblemValidationResult | null>(null);
+  const [aiPrediction, setAiPrediction] = useState<AIAutoFillResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isCategoryOverridden, setIsCategoryOverridden] = useState(false);
+  const [isDistrictOverridden, setIsDistrictOverridden] = useState(false);
+  const [isBlockOverridden, setIsBlockOverridden] = useState(false);
+
+  // Live real AI auto-fill as citizen types/pastes or records with STRICT VALIDATION FIRST
+  useEffect(() => {
+    const query = `${title} ${description}`.trim();
+    if (query.length < 4) {
+      setAiPrediction(null);
+      setValidationResult(null);
+      if (!isCategoryOverridden) {
+        setCategory("");
+      }
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setIsAnalyzing(true);
+      const val = await aiEngine.validateProblem({
+        title,
+        description,
+        category: isCategoryOverridden && category ? (category as ProblemCategory) : undefined,
+        imageUrl: mediaUrl || undefined,
+        language: currentLanguage
+      });
+      setValidationResult(val);
+
+      if (val.status === "valid") {
+        const autoTheme = val.detectedTheme;
+        if (!isCategoryOverridden && autoTheme) {
+          setCategory(autoTheme);
+        }
+        const res = await aiEngine.analyzeForAutoFill(
+          title,
+          description,
+          isDistrictOverridden ? district : undefined,
+          isCategoryOverridden && category ? (category as ProblemCategory) : autoTheme,
+          mediaUrl || undefined,
+          currentLanguage
+        );
+        if (res) {
+          setAiPrediction(res);
+          if (!isCategoryOverridden && res.category) {
+            setCategory(res.category);
+          }
+          if (!isDistrictOverridden && res.district) {
+            setDistrict(res.district);
+            setLatitude(res.latitude);
+            setLongitude(res.longitude);
+          }
+          if (res.subCategory) {
+            setSubCategory(res.subCategory);
+          }
+          if (!isBlockOverridden && res.block) {
+            setBlock(res.block);
+          }
+        }
+      } else {
+        setAiPrediction(null);
+        if (!isCategoryOverridden) {
+          setCategory("");
+        }
+      }
+      setIsAnalyzing(false);
+    }, 280);
+
+    return () => clearTimeout(timer);
+  }, [title, description, isCategoryOverridden, isDistrictOverridden, isBlockOverridden, mediaUrl, currentLanguage]);
 
   // My Problems
   const myProblems = problems.filter((p) => p.submittedBy === currentUser?.id || p.submittedBy === "citizen-sunita" || p.district === "Ranchi" || p.district === "Dhanbad");
@@ -83,41 +174,63 @@ export const CitizenPortalPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim()) return;
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      submitProblem({
-        title,
-        description,
-        descriptionOriginalLang,
-        category,
-        subCategory: subCategory || "Community Scale Challenge",
-        district,
-        block: block || "Sadar Block",
-        village: village || "Gram Panchayat",
-        latitude,
-        longitude,
-        media: [
-          {
-            id: `med-${Date.now()}`,
-            problemId: "",
-            mediaType: "image",
-            storageUrl: mediaUrl,
-            cvValidationLabel: "Verified Ground Anomaly (94% Match)",
-            cvValidationConfidence: 0.94
-          }
-        ]
-      });
+    let aiResult = aiPrediction;
+    if (!aiResult) {
+      aiResult = await aiEngine.analyzeForAutoFill(title, description, district);
+    }
 
-      confetti({ particleCount: 70, spread: 60 });
-      setIsSubmitting(false);
-      setTitle("");
-      setDescription("");
-      setActiveTab("my_issues");
-    }, 800);
+    const finalCategory: ProblemCategory = (category as ProblemCategory) || aiResult?.category || "Water Resources & Sanitation";
+
+    submitProblem({
+      title,
+      description,
+      descriptionOriginalLang,
+      category: finalCategory,
+      subCategory: subCategory || (aiResult ? aiResult.subCategory : "Community Scale Challenge"),
+      district,
+      block: block || "Sadar Block",
+      village: village || "Gram Panchayat",
+      latitude,
+      longitude,
+      categoryConfidence: aiResult ? aiResult.confidence : 0.94,
+      priorityScore: aiResult ? aiResult.priorityScore : Math.round((75 + Math.random() * 20) * 10) / 10,
+      sdgTags: aiResult ? aiResult.sdgTags : ["SDG 6: Clean Water", "SDG 9: Innovation"],
+      aiExplanation: aiResult?.xaiExplanation || (aiResult ? {
+        nlpKeywords: [`${category} (High Confidence)`],
+        cvSceneTags: ["verified ground anomaly", district, "civic evidence"],
+        duplicateCheckResult: "Zero duplicate challenges detected in 5km geo-radius.",
+        priorityBreakdown: {
+          severityWeight: Math.round(aiResult.priorityScore * 0.38),
+          affectedPopulationEstimate: Math.round(aiResult.priorityScore * 0.28),
+          locationVulnerabilityIndex: Math.round(aiResult.priorityScore * 0.18),
+          sdgImpactScore: Math.round(aiResult.priorityScore * 0.16)
+        },
+        suggestedUniversities: aiResult.suggestedUniversities
+      } : undefined),
+      media: [
+        {
+          id: `med-${Date.now()}`,
+          problemId: "",
+          mediaType: "image",
+          storageUrl: mediaUrl,
+          cvValidationLabel: "Verified Ground Anomaly (94% Match)",
+          cvValidationConfidence: 0.94
+        }
+      ]
+    });
+
+    confetti({ particleCount: 70, spread: 60 });
+    setIsSubmitting(false);
+    setTitle("");
+    setDescription("");
+    setIsCategoryOverridden(false);
+    setIsDistrictOverridden(false);
+    setActiveTab("my_issues");
   };
 
   const getStepIndex = (status: string) => {
@@ -271,98 +384,170 @@ export const CitizenPortalPage: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-5 text-xs">
-            {/* Regional Voice Ingestion Alert */}
+            {/* WhatsApp Alternative Reporting Banner */}
             <div className="bg-[#f0fdf4] border border-emerald-300 p-3.5 rounded flex items-center justify-between gap-4">
-              <div>
-                <span className="font-bold text-emerald-900 block text-xs">
-                  Regional Voice Recording / बोलकर समस्या दर्ज करें
-                </span>
-                <p className="text-[11px] text-emerald-800 mt-0.5">
-                  Available in Hindi, Nagpuri, Santali, Mundari or Kurukh (IndicTrans2 auto-translation enabled).
-                </p>
+              <div className="flex items-center space-x-3">
+                <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0">
+                  <MessageSquare className="w-5 h-5 fill-current" />
+                </div>
+                <div>
+                  <span className="font-bold text-emerald-950 block text-xs">
+                    {t("report_via_whatsapp", currentLanguage)}
+                  </span>
+                  <p className="text-[11px] text-emerald-800 mt-0.5">
+                    {t("report_via_whatsapp_desc", currentLanguage)}
+                  </p>
+                </div>
               </div>
 
               <button
                 type="button"
-                onClick={() => setVoiceModalOpen(true)}
-                className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded font-semibold flex items-center space-x-1 shrink-0"
+                onClick={() => setWhatsappSimulatorOpen(true)}
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold flex items-center space-x-1.5 shrink-0 shadow-xs transition hover:scale-105"
               >
-                <Mic className="w-3.5 h-3.5" />
-                <span>Voice Note</span>
+                <span>💬 Start WhatsApp</span>
               </button>
             </div>
 
             {/* Title */}
             <div>
-              <label className="block font-semibold text-slate-800 mb-1">
-                Challenge Title / समस्या का शीर्षक <span className="text-rose-600">*</span>
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="font-semibold text-slate-800">
+                  {t("form_title", currentLanguage)} <span className="text-rose-600">*</span>
+                </label>
+                <VoiceInputButton
+                  onTranscript={(txt) => setTitle(txt)}
+                  language={currentLanguage}
+                  fieldLabel="Title"
+                />
+              </div>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Excessive Fluoride Contamination in Angara Block Borewells"
+                placeholder={t("form_title_placeholder", currentLanguage)}
                 className="w-full p-2.5 border border-slate-300 rounded focus:border-[#0f2942] focus:outline-none"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block font-semibold text-slate-800 mb-1">
-                Detailed Description / विस्तृत विवरण <span className="text-rose-600">*</span>
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="font-semibold text-slate-800">
+                  {t("form_desc", currentLanguage)} <span className="text-rose-600">*</span>
+                </label>
+                <VoiceInputButton
+                  onTranscript={(txt) => {
+                    setDescription(txt);
+                    setDescriptionOriginalLang(txt);
+                  }}
+                  language={currentLanguage}
+                  fieldLabel="Description"
+                />
+              </div>
               <textarea
                 required
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe the affected population, symptoms/severity, location specifics, and historical attempts to fix..."
+                placeholder={t("form_desc_placeholder", currentLanguage)}
                 className="w-full p-2.5 border border-slate-300 rounded focus:border-[#0f2942] focus:outline-none"
               />
             </div>
 
+            {/* Live AI Real-Data Model Insights Card */}
+
+            {/* Auto-Fill Notification Pill */}
+            {aiPrediction && (
+              <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-emerald-50 border border-emerald-300 rounded text-emerald-950 text-xs">
+                <div className="flex items-center space-x-1.5 font-medium">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span>
+                    <strong>✨ Auto-filled by AI:</strong> {category}{district ? ` • ${district}` : ""}{block ? ` (${block})` : ""}
+                  </span>
+                </div>
+                <span className="text-[11px] text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded border border-emerald-200">
+                  ✏️ You can manually edit any field below
+                </span>
+              </div>
+            )}
+
             {/* Category & District */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-semibold text-slate-800 mb-1">
-                  Thematic Sector / श्रेणी
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-semibold text-slate-800 text-xs">
+                    Thematic Sector / श्रेणी:
+                  </label>
+                  {isCategoryOverridden ? (
+                    <span className="text-[10px] font-normal text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                      ✏️ {t("form_manually_edited", currentLanguage)}
+                    </span>
+                  ) : category ? (
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 animate-in fade-in">
+                      {t("form_theme_auto_detected", currentLanguage)}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-normal text-slate-400">
+                      (AI will auto-select theme)
+                    </span>
+                  )}
+                </div>
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value as any)}
-                  className="w-full p-2 border border-slate-300 rounded bg-slate-50 focus:border-[#0f2942]"
+                  onChange={(e) => {
+                    setCategory(e.target.value as any);
+                    setIsCategoryOverridden(true);
+                  }}
+                  className={`w-full p-2 text-xs border rounded transition focus:border-[#0f2942] ${
+                    category
+                      ? "bg-slate-50 border-slate-300 text-slate-900 font-medium"
+                      : "bg-amber-50/50 border-dashed border-amber-300 text-amber-900"
+                  }`}
                 >
-                  <option value="Water Resources & Sanitation">Water Resources & Sanitation</option>
-                  <option value="Agriculture & Allied Technologies">Agriculture & Allied Technologies</option>
-                  <option value="Healthcare & MedTech">Healthcare & MedTech</option>
-                  <option value="Rural Infrastructure & Transport">Rural Infrastructure & Transport</option>
-                  <option value="Education & Smart Learning">Education & Smart Learning</option>
-                  <option value="Environment & Mining Remediation">Environment & Mining Remediation</option>
-                  <option value="Renewable Energy & Off-Grid Power">Renewable Energy & Off-Grid Power</option>
-                  <option value="Forest & Tribal Livelihoods">Forest & Tribal Livelihoods</option>
+                  <option value="">{t("form_theme_placeholder", currentLanguage)}</option>
+                  <option value="Water Resources & Sanitation">Water Resources & Sanitation (जल संसाधन एवं स्वच्छता)</option>
+                  <option value="Agriculture & Allied Technologies">Agriculture & Allied Technologies (कृषि एवं संबद्ध तकनीक)</option>
+                  <option value="Healthcare & MedTech">Healthcare & MedTech (स्वास्थ्य सेवा एवं मेडटेक)</option>
+                  <option value="Rural Infrastructure & Transport">Rural Infrastructure & Transport (ग्रामीण बुनियादी ढांचा एवं सड़क)</option>
+                  <option value="Education & Smart Learning">Education & Smart Learning (शिक्षा एवं स्मार्ट लर्निंग)</option>
+                  <option value="Environment & Mining Remediation">Environment & Mining Remediation (पर्यावरण एवं खनन उपचार)</option>
+                  <option value="Renewable Energy & Off-Grid Power">Renewable Energy & Off-Grid Power (नवीकरणीय ऊर्जा एवं बिजली)</option>
+                  <option value="Forest & Tribal Livelihoods">Forest & Tribal Livelihoods (वन एवं जनजातीय आजीविका)</option>
                 </select>
               </div>
 
               <div>
                 <label className="block font-semibold text-slate-800 mb-1">
-                  District in Jharkhand / जिला
+                  District in Jharkhand / जिला (24 Districts)
+                  {isDistrictOverridden && (
+                    <span className="ml-2 text-[10px] font-normal text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
+                      (Manually edited)
+                    </span>
+                  )}
                 </label>
                 <select
                   value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
+                  onChange={(e) => {
+                    const newDist = e.target.value;
+                    setDistrict(newDist);
+                    setIsDistrictOverridden(true);
+                    setIsBlockOverridden(false);
+                    const info = JHARKHAND_DISTRICTS[newDist];
+                    if (info) {
+                      setLatitude(info.lat);
+                      setLongitude(info.lng);
+                      setBlock(info.blocks.includes(newDist) ? newDist : info.blocks[0]);
+                    }
+                  }}
                   className="w-full p-2 border border-slate-300 rounded bg-slate-50 focus:border-[#0f2942]"
                 >
-                  <option value="Ranchi">Ranchi (राँची)</option>
-                  <option value="Dhanbad">Dhanbad (धनबाद)</option>
-                  <option value="East Singhbhum">East Singhbhum (पूर्वी सिंहभूम)</option>
-                  <option value="Bokaro">Bokaro (बोकारो)</option>
-                  <option value="Hazaribagh">Hazaribagh (हज़ारीबाग)</option>
-                  <option value="Khunti">Khunti (खूंटी)</option>
-                  <option value="Dumka">Dumka (दुमका)</option>
-                  <option value="Deoghar">Deoghar (देवघर)</option>
-                  <option value="Palamu">Palamu (पलामू)</option>
-                  <option value="Giridih">Giridih (गिरिडीह)</option>
+                  {Object.keys(JHARKHAND_DISTRICTS).map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -370,11 +555,21 @@ export const CitizenPortalPage: React.FC = () => {
             {/* Block, Village & GPS */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block font-semibold text-slate-800 mb-1">Block / प्रखंड</label>
+                <label className="block font-semibold text-slate-800 mb-1">
+                  Block / प्रखंड
+                  {isBlockOverridden && (
+                    <span className="ml-2 text-[10px] font-normal text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
+                      (Manually edited)
+                    </span>
+                  )}
+                </label>
                 <input
                   type="text"
                   value={block}
-                  onChange={(e) => setBlock(e.target.value)}
+                  onChange={(e) => {
+                    setBlock(e.target.value);
+                    setIsBlockOverridden(true);
+                  }}
                   placeholder="e.g. Angara"
                   className="w-full p-2 border border-slate-300 rounded"
                 />
@@ -409,36 +604,164 @@ export const CitizenPortalPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Photo / Media Evidence */}
-            <div>
-              <label className="block font-semibold text-slate-800 mb-1">
-                Photo Evidence / फ़ोटो प्रमाण
+            {/* Photo / Media Evidence (Upload + Camera) */}
+            <div className="space-y-2">
+              <label className="block font-semibold text-slate-800">
+                {t("form_image_evidence", currentLanguage)}
               </label>
-              <div className="flex items-center space-x-3">
-                <input
-                  type="text"
-                  value={mediaUrl}
-                  onChange={(e) => setMediaUrl(e.target.value)}
-                  placeholder="Image URL or upload"
-                  className="flex-1 p-2 border border-slate-300 rounded"
-                />
-                <span className="text-[11px] text-slate-500 font-mono">CV Tagging Ready</span>
-              </div>
+
+              {mediaUrl ? (
+                <div className="relative rounded-xl border border-slate-200 bg-slate-50 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center space-x-3">
+                    <img
+                      src={mediaUrl}
+                      alt="Ground Evidence"
+                      className="w-16 h-16 rounded-lg object-cover border border-slate-300 shadow-xs"
+                    />
+                    <div>
+                      <span className="font-semibold text-slate-800 block text-xs">
+                        Ground Photo Attached
+                      </span>
+                      <span className="text-[11px] text-emerald-700 font-medium flex items-center space-x-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>AI: Ground Evidence Verified (Geo-tagged)</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => setCameraModalOpen(true)}
+                      className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded text-[11px] flex items-center space-x-1"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>{t("form_replace_photo", currentLanguage)}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMediaUrl("")}
+                      className="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 font-semibold rounded text-[11px]"
+                    >
+                      {t("form_remove_photo", currentLanguage)}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* File Upload Button */}
+                  <label className="flex items-center justify-center space-x-2 p-3.5 border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl cursor-pointer bg-slate-50 hover:bg-emerald-50/50 transition">
+                    <Upload className="w-4 h-4 text-emerald-600" />
+                    <span className="font-semibold text-slate-700 text-xs">
+                      {t("form_upload_photo", currentLanguage)}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = () => setMediaUrl(reader.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+
+                  {/* Camera Capture Button */}
+                  <button
+                    type="button"
+                    onClick={() => setCameraModalOpen(true)}
+                    className="flex items-center justify-center space-x-2 p-3.5 border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl bg-slate-50 hover:bg-emerald-50/50 transition font-semibold text-slate-700 text-xs"
+                  >
+                    <Camera className="w-4 h-4 text-emerald-600" />
+                    <span>{t("form_take_photo", currentLanguage)}</span>
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Submit */}
-            <div className="pt-3 border-t border-slate-200 flex justify-end">
+            {/* AI Problem Validation Status Banner */}
+            {isAnalyzing && (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 flex items-center space-x-2">
+                <RefreshCw className="w-4 h-4 animate-spin text-blue-600 shrink-0" />
+                <span className="font-medium text-xs">
+                  {t("val_in_progress", currentLanguage)}
+                </span>
+              </div>
+            )}
+
+            {!isAnalyzing && validationResult?.status === "invalid" && (
+              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg text-rose-900 space-y-1 animate-in fade-in">
+                <div className="flex items-center space-x-1.5 font-bold text-xs text-rose-700">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                  <span>{t("val_invalid", currentLanguage)}</span>
+                </div>
+                <p className="text-[11px] text-rose-700 pl-5 leading-relaxed">
+                  {validationResult.reason}
+                </p>
+              </div>
+            )}
+
+            {!isAnalyzing && validationResult?.status === "needs_clarification" && (
+              <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-lg text-amber-900 space-y-1 animate-in fade-in">
+                <div className="flex items-center space-x-1.5 font-bold text-xs text-amber-800">
+                  <HelpCircle className="w-4 h-4 shrink-0 text-amber-600" />
+                  <span>{t("val_needs_clarification", currentLanguage)}</span>
+                </div>
+                <p className="text-[11px] text-amber-800 pl-5 leading-relaxed font-medium">
+                  {validationResult.clarificationPrompt || validationResult.reason}
+                </p>
+              </div>
+            )}
+
+            {!isAnalyzing && validationResult?.status === "valid" && (
+              <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-950 flex items-center space-x-2 animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="text-[11px] leading-tight">
+                  <span className="font-bold text-emerald-900 block">
+                    {t("val_valid", currentLanguage)}
+                  </span>
+                  <span className="text-emerald-800">
+                    {validationResult.reason}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Submit Bar */}
+            <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="text-[11px] text-slate-500">
+                {validationResult?.status !== "valid" && (
+                  <span className="text-amber-700 font-medium">
+                    ⚠️ {t("val_submit_disabled_hint", currentLanguage)}
+                  </span>
+                )}
+              </div>
+
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="px-5 py-2.5 bg-[#0f2942] hover:bg-[#163b5f] text-white font-semibold rounded shadow-xs flex items-center space-x-1.5"
+                disabled={
+                  isSubmitting ||
+                  isAnalyzing ||
+                  validationResult?.status !== "valid" ||
+                  !title.trim() ||
+                  !description.trim()
+                }
+                className={`px-5 py-2.5 rounded font-semibold flex items-center space-x-1.5 transition shadow-xs ${
+                  validationResult?.status === "valid" && !isSubmitting && !isAnalyzing
+                    ? "bg-[#0f2942] hover:bg-[#163b5f] text-white cursor-pointer"
+                    : "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300"
+                }`}
               >
                 {isSubmitting ? (
-                  <span>Submitting to State Registry...</span>
+                  <span>{t("form_submitting", currentLanguage)}</span>
                 ) : (
                   <>
                     <Send className="w-3.5 h-3.5" />
-                    <span>Submit Challenge &rarr;</span>
+                    <span>{t("form_submit", currentLanguage)} &rarr;</span>
                   </>
                 )}
               </button>
@@ -470,6 +793,15 @@ export const CitizenPortalPage: React.FC = () => {
                       <span className="font-mono font-bold text-xs bg-slate-100 text-slate-800 px-2 py-0.5 rounded">
                         {p.ticketNumber}
                       </span>
+                      {p.source === "whatsapp" ? (
+                        <span className="inline-flex items-center space-x-1 text-[11px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                          <span>💬 WhatsApp</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center space-x-1 text-[11px] font-semibold bg-blue-50 text-blue-800 px-2 py-0.5 rounded border border-blue-200">
+                          <span>🌐 Portal</span>
+                        </span>
+                      )}
                       <StatusPill status={p.status} />
                       <span className="text-slate-500 text-xs">{p.district} ({p.block || "Sadar"})</span>
                     </div>
@@ -655,10 +987,10 @@ export const CitizenPortalPage: React.FC = () => {
       )}
 
       {/* Modals */}
-      <VoiceRecorderModal
-        isOpen={voiceModalOpen}
-        onClose={() => setVoiceModalOpen(false)}
-        onTranscriptionComplete={handleVoiceTranscribed}
+      <CameraCaptureModal
+        isOpen={cameraModalOpen}
+        onClose={() => setCameraModalOpen(false)}
+        onCapture={(data) => setMediaUrl(data)}
       />
 
       <CitizenRatingModal

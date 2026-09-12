@@ -9,12 +9,14 @@ import {
   ChevronDown,
   Globe,
   Bell,
-  FileCheck
+  FileCheck,
+  MessageSquare
 } from "lucide-react";
+import { t } from "../../i18n/translations";
 
 export const GovtHeader: React.FC = () => {
   const { currentUser, isAuthenticated, logout, loginAsRole, demoUsers } = useAuth();
-  const { currentLanguage, setCurrentLanguage, notifications, markNotificationAsRead } = useApp();
+  const { currentLanguage, setCurrentLanguage, notifications, markNotificationAsRead, setWhatsappSimulatorOpen } = useApp();
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -142,6 +144,17 @@ export const GovtHeader: React.FC = () => {
 
           {/* Right Action Area */}
           <div className="flex items-center space-x-3">
+            {/* WhatsApp Reporting Gateway Trigger */}
+            <button
+              onClick={() => setWhatsappSimulatorOpen(true)}
+              className="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-md text-xs font-bold shadow-xs transition hover:scale-105"
+              title="Report problem via WhatsApp simulator"
+            >
+              <MessageSquare className="w-3.5 h-3.5 fill-current" />
+              <span className="hidden sm:inline">{t("report_via_whatsapp", currentLanguage)}</span>
+              <span className="sm:hidden">WhatsApp</span>
+            </button>
+
             {isAuthenticated && currentUser ? (
               <>
                 {/* Notification Bell */}

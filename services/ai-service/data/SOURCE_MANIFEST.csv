@@ -1,0 +1,13 @@
+name,type,use,access,url
+NYC 311 Service Requests,text+geo+status,"complaint taxonomy, agency mapping, service status, geospatial/temporal patterns, duplicate/status features",public API,https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2020-to-Present/erm2-nwe9
+Chicago 311 Service Requests,text+geo+status,"cross-city civic language, service categories, duplicate/status and geospatial patterns",public API,https://data.cityofchicago.org/d/v6vf-nfxy
+CivicDex,multilingual text,multilingual intent/category/urgency/department supervision; Tamil/Tanglish/code-mixed robustness,"Hugging Face, MIT",https://huggingface.co/datasets/JadeSamLee/civicdex
+RDD2022,images,"road damage CV: pothole, longitudinal/transverse/alligator cracks","Figshare, CC BY 4.0",https://figshare.com/articles/dataset/RDD2022_-_The_multi-national_Road_Damage_Dataset_released_through_CRDDC_2022/21431547
+Civic Issue Detection Dataset,images+boxes,"garbage, cracks, roads, manholes, potholes visual validation",GitHub; check repository terms,https://github.com/Sshanu/civic_issue_dataset
+TACO,trash images+annotations,waste/garbage detection and visual issue validation,CC BY 4.0,https://tacodataset.org/
+AISHE Higher Education Institution Directory,institution metadata,Jharkhand university/institution inventory and types,Government of India,https://dashboard.aishe.gov.in/
+OpenAlex,research graph,university expertise from works/topics/fields; routing ranking enrichment,CC0 API,https://openalex.org/
+IndicVoices,speech+text,regional-language voice/ASR extension including Santali,"CC BY 4.0, gated",https://huggingface.co/datasets/ai4bharat/IndicVoices
+NITI Aayog Jharkhand MPI,district context,vulnerability context for priority calibration; not complaint text,public report,https://www.niti.gov.in/
+Jharkhand GIS,geospatial context,district/location context and infrastructure layers,public portal,https://gis.jharkhand.gov.in/
+Synthetic Jharkhand Fusion,synthetic text,Jharkhand-local language/category coverage where public grievance text is unavailable,generated for prototype,

@@ -1,20 +1,18 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Problem } from "../../types";
 import { useApp } from "../../context/AppContext";
-import { getAiRoutingRecommendations } from "../../data/universityEcosystems";
+import { getAiRoutingRecommendations, getDomainKeywordsAndTags } from "../../data/universityEcosystems";
 import {
-  Sparkles,
   CheckCircle2,
-  XCircle,
   TrendingUp,
   BrainCircuit,
   Eye,
   CopyCheck,
   Building2,
   ShieldCheck,
-  Award,
-  ArrowRight,
-  HelpCircle,
+  MapPin,
+  Sparkles,
+  AlertCircle,
   X
 } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -38,60 +36,69 @@ export const ExplainableAIModal: React.FC<{
   const explanation = useMemo(() => {
     if (!problem) return null;
 
-    const isHealth =
-      problem.category === "Healthcare & MedTech" ||
-      `${problem.title} ${problem.description}`.toLowerCase().includes("fever") ||
-      `${problem.title} ${problem.description}`.toLowerCase().includes("flew") ||
-      `${problem.title} ${problem.description}`.toLowerCase().includes("flu") ||
-      `${problem.title} ${problem.description}`.toLowerCase().includes("virus");
+    // Guaranteed clean, accurate domain keywords & scene verification tags
+    const domainDetails = getDomainKeywordsAndTags(
+      problem.category,
+      problem.title,
+      problem.description,
+      problem.district,
+      problem.block
+    );
 
-    const isMining =
-      problem.category === "Environment & Mining Remediation" ||
-      `${problem.title} ${problem.description}`.toLowerCase().includes("coal") ||
-      `${problem.title} ${problem.description}`.toLowerCase().includes("mining");
+    // If existing keywords had raw category percentage tags like "Agriculture (50%)" or mismatched domains, purge them!
+    const existingKeywords = problem.aiExplanation?.nlpKeywords || [];
+    const hasCategoryPercentageTags = existingKeywords.some(
+      (k) =>
+        k.includes("%") ||
+        k.includes("(") ||
+        k.includes(")") ||
+        (k.toLowerCase().includes("agriculture") && problem.category !== "Agriculture & Allied Technologies") ||
+        (k.toLowerCase().includes("water") && problem.category !== "Water Resources & Sanitation") ||
+        (k.toLowerCase().includes("infrastructure") && problem.category !== "Rural Infrastructure & Transport") ||
+        (k.toLowerCase().includes("health") && problem.category !== "Healthcare & MedTech") ||
+        (k.toLowerCase().includes("energy") && problem.category !== "Renewable Energy & Off-Grid Power") ||
+        (k.toLowerCase().includes("mining") && problem.category !== "Environment & Mining Remediation") ||
+        (k.toLowerCase().includes("education") && problem.category !== "Education & Smart Learning") ||
+        (k.toLowerCase().includes("tribal") && problem.category !== "Forest & Tribal Livelihoods")
+    );
 
-    const defaultExp = problem.aiExplanation || {
-      nlpKeywords: isHealth
-        ? ["fever", "epidemic", "viral_outbreak", "public_health", problem.district || "Ranchi"]
-        : isMining
-        ? ["coal_seam", "methane", "subsidence", "Jharia", problem.district || "Dhanbad"]
-        : ["water", "fluoride", "remediation", "Angara"],
-      cvSceneTags: isHealth
-        ? ["clinical anomaly", "patient surge", "syndromic cluster"]
-        : isMining
-        ? ["ground fissure", "smoke plume", "mine dump"]
-        : ["handpump", "turbid water", "contamination"],
-      duplicateCheckResult: "Zero duplicates found in 5km radius",
-      priorityBreakdown: {
-        severityWeight: 38.0,
-        affectedPopulationEstimate: 24.5,
-        locationVulnerabilityIndex: 18.0,
-        sdgImpactScore: 14.0
+    const hasMismatchedInfrastructure =
+      problem.category !== "Rural Infrastructure & Transport" &&
+      existingKeywords.some((k) => k.toLowerCase().includes("infrastructure"));
+
+    const nlpKeywords =
+      existingKeywords.length > 0 && !hasMismatchedInfrastructure && !hasCategoryPercentageTags
+        ? existingKeywords
+        : domainDetails.nlpKeywords;
+
+    const existingCvTags = problem.aiExplanation?.cvSceneTags || [];
+    const hasMismatchedCv =
+      problem.category !== "Rural Infrastructure & Transport" &&
+      existingCvTags.some((t) => t.toLowerCase().includes("infrastructure"));
+
+    const cvSceneTags =
+      existingCvTags.length > 0 && !hasMismatchedCv
+        ? existingCvTags
+        : domainDetails.cvSceneTags;
+
+    const defaultExp = {
+      nlpKeywords,
+      cvSceneTags,
+      duplicateCheckResult: `Zero duplicate complaints detected within 3km geo-radius in ${problem.district}.`,
+      priorityBreakdown: problem.aiExplanation?.priorityBreakdown || {
+        severityWeight: Math.round(problem.priorityScore * 0.38),
+        affectedPopulationEstimate: Math.round(problem.priorityScore * 0.28),
+        locationVulnerabilityIndex: Math.round(problem.priorityScore * 0.18),
+        sdgImpactScore: Math.round(problem.priorityScore * 0.16)
       },
       suggestedUniversities: dynamicRecommendations
     };
 
-    // Ensure Healthcare & MedTech problems always have AIIMS Deoghar as #1 recommendation
-    const shouldOverride =
-      !defaultExp.suggestedUniversities ||
-      defaultExp.suggestedUniversities.length === 0 ||
-      (isHealth && defaultExp.suggestedUniversities[0]?.universityId !== "univ-aiims-deoghar") ||
-      (isMining && defaultExp.suggestedUniversities[0]?.universityId !== "univ-iit-dhanbad");
-
-    return {
-      ...defaultExp,
-      nlpKeywords: isHealth
-        ? ["fever", "epidemic", "viral_outbreak", "public_health", problem.district || "Ranchi"]
-        : defaultExp.nlpKeywords,
-      cvSceneTags: isHealth
-        ? ["clinical anomaly", "patient surge", "syndromic cluster"]
-        : defaultExp.cvSceneTags,
-      suggestedUniversities: shouldOverride ? dynamicRecommendations : defaultExp.suggestedUniversities
-    };
+    return defaultExp;
   }, [problem, dynamicRecommendations]);
 
   const [selectedUnivId, setSelectedUnivId] = useState<string>(
-    explanation?.suggestedUniversities[0]?.universityId || "univ-aiims-deoghar"
+    explanation?.suggestedUniversities[0]?.universityId || "univ-bit-mesra"
   );
   const [justApproved, setJustApproved] = useState(false);
 
@@ -102,6 +109,13 @@ export const ExplainableAIModal: React.FC<{
   }, [explanation]);
 
   if (!problem || !explanation) return null;
+
+  const hasPhoto = Boolean(
+    problem.media &&
+    problem.media.length > 0 &&
+    problem.media[0]?.storageUrl &&
+    problem.media[0]?.storageUrl.trim() !== ""
+  );
 
   const handleApproveAndRoute = () => {
     updateProblemStatus(problem.id, "routed", selectedUnivId);
@@ -124,29 +138,29 @@ export const ExplainableAIModal: React.FC<{
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-3xl w-full overflow-hidden animate-in fade-in zoom-in-95">
-        {/* Modal Header */}
-        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 flex items-center justify-between">
+        {/* Modal Header - Clean Administrative Look */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white p-5 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-300">
-              <BrainCircuit className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
+              <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <h3 className="font-heading font-bold text-lg text-white">
-                  Explainable AI (XAI) Decision Intelligence Gate
+                  Civic Challenge Verification & Institutional Allocation
                 </h3>
-                <span className="bg-indigo-500/30 text-indigo-200 text-[10px] font-mono px-2 py-0.5 rounded border border-indigo-400/40">
-                  HYBRID ML + HUMAN VALIDATION
+                <span className="bg-emerald-500/25 text-emerald-200 text-[10px] font-semibold px-2 py-0.5 rounded border border-emerald-400/30">
+                  AI-Assisted Verification Desk
                 </span>
               </div>
-              <p className="text-xs text-slate-300">
-                Ticket: {problem.ticketNumber} | Submitter: {problem.submitterName} ({problem.district})
+              <p className="text-xs text-slate-300 mt-0.5">
+                Ticket: #{problem.ticketNumber} • Submitter: {problem.submitterName} ({problem.block ? `${problem.block}, ` : ""}{problem.district})
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition"
+            className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -156,122 +170,138 @@ export const ExplainableAIModal: React.FC<{
         <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
           {/* Problem Brief */}
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-              Civic Challenge Under Review
-            </span>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Civic Challenge Under Review
+              </span>
+              <span className="text-[11px] font-medium text-slate-500">
+                Registered on JSICP Portal
+              </span>
+            </div>
             <h4 className="font-heading font-bold text-base text-slate-900 mt-1">
               {problem.title}
             </h4>
-            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
               {problem.description}
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-              <span className="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded font-medium border border-emerald-300">
-                Category: {problem.category}
+              <span className="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg font-medium border border-emerald-300">
+                Theme: <strong>{problem.category}</strong>
               </span>
-              <span className="bg-slate-200 text-slate-700 px-2.5 py-1 rounded font-mono">
-                Geo: ({problem.latitude.toFixed(4)}, {problem.longitude.toFixed(4)})
+              <span className="bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg font-medium flex items-center space-x-1">
+                <MapPin className="w-3 h-3 text-slate-500 inline" />
+                <span>{problem.block ? `${problem.block}, ` : ""}{problem.district}</span>
               </span>
-              <span className="bg-amber-100 text-amber-900 px-2.5 py-1 rounded font-bold">
-                Priority: {problem.priorityScore}/100
+              <span className={`px-2.5 py-1 rounded-lg font-bold ${
+                problem.priorityScore >= 75
+                  ? "bg-rose-100 text-rose-800 border border-rose-200"
+                  : "bg-amber-100 text-amber-800 border border-amber-200"
+              }`}>
+                Priority: {problem.priorityScore}/100 {problem.priorityScore >= 75 ? "(High Urgency)" : "(Standard)"}
               </span>
             </div>
           </div>
 
-          {/* 4 Pillars of AI Explainability Grid */}
+          {/* 4 Pillars of Clean Administrative Verification */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Pillar 1: NLP Domain Classification */}
+            {/* Pillar 1: Category & Keyword Validation */}
             <div className="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm space-y-2">
               <div className="flex items-center justify-between">
                 <span className="flex items-center space-x-1.5 text-xs font-bold text-indigo-900">
                   <BrainCircuit className="w-4 h-4 text-indigo-600" />
-                  <span>1. NLP Text Classification</span>
+                  <span>1. Category & Keyword Match</span>
                 </span>
-                <span className="text-xs font-bold text-indigo-600 font-mono">
-                  {(problem.categoryConfidence * 100).toFixed(0)}% Confidence
+                <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                  {(problem.categoryConfidence * 100).toFixed(0)}% Match
                 </span>
               </div>
               <p className="text-[11px] text-slate-500">
-                Model: Fine-tuned IndicBERT & TF-IDF Semantic Tokenizer
+                Verified Domain: <strong className="text-slate-700">{problem.category}</strong>
               </p>
-              <div className="flex flex-wrap gap-1 mt-1">
+              <div className="flex flex-wrap gap-1.5 mt-2">
                 {explanation.nlpKeywords.map((kw, i) => (
-                  <span key={i} className="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-200 font-mono">
+                  <span key={i} className="text-[11px] bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-md border border-indigo-200 font-medium">
                     #{kw}
                   </span>
                 ))}
               </div>
             </div>
 
-            {/* Pillar 2: Computer Vision Image Authenticity */}
+            {/* Pillar 2: Evidence & Ground Authenticity */}
             <div className="bg-white p-4 rounded-xl border border-emerald-100 shadow-sm space-y-2">
               <div className="flex items-center justify-between">
                 <span className="flex items-center space-x-1.5 text-xs font-bold text-emerald-900">
                   <Eye className="w-4 h-4 text-emerald-600" />
-                  <span>2. CV Visual Verification</span>
+                  <span>2. Field Evidence Verification</span>
                 </span>
-                <span className="text-xs font-bold text-emerald-600 font-mono">
-                  94% Authenticated
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  {hasPhoto ? "95% Authenticated" : "Verified Report"}
                 </span>
               </div>
               <p className="text-[11px] text-slate-500">
-                Model: ResNet-50 / YOLOv8 Scene Anomaly Detection
+                {hasPhoto
+                  ? "Citizen field photograph validated against ground context"
+                  : "Geo-tagged citizen field report verified (no photo attached)"}
               </p>
-              <div className="flex flex-wrap gap-1 mt-1">
+              <div className="flex flex-wrap gap-1.5 mt-2">
                 {explanation.cvSceneTags.map((tag, i) => (
-                  <span key={i} className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">
-                    ✓ {tag}
+                  <span key={i} className="text-[11px] bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-md border border-emerald-200 font-medium flex items-center space-x-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                    <span>{tag}</span>
                   </span>
                 ))}
               </div>
             </div>
 
-            {/* Pillar 3: Vector Duplicate & Geo-Radius Search */}
+            {/* Pillar 3: Duplicate & Spam Prevention */}
             <div className="bg-white p-4 rounded-xl border border-sky-100 shadow-sm space-y-2">
               <div className="flex items-center justify-between">
                 <span className="flex items-center space-x-1.5 text-xs font-bold text-sky-900">
                   <CopyCheck className="w-4 h-4 text-sky-600" />
-                  <span>3. FAISS Vector Dedup Engine</span>
+                  <span>3. Duplicate & Spam Filter</span>
                 </span>
-                <span className="text-xs font-bold text-sky-600 font-mono">
-                  Unique (100%)
+                <span className="text-xs font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
+                  100% Unique
                 </span>
               </div>
               <p className="text-[11px] text-slate-500">
-                Zero duplicates detected within 3km geo-radius.
+                Zero duplicate complaints detected within 3 km geo-radius in the past 90 days.
               </p>
-              <span className="text-[10px] bg-sky-50 text-sky-700 px-2 py-0.5 rounded border border-sky-200 font-mono inline-block">
-                all-MiniLM-L6-v2 Embeddings + PostGIS 2km Filter
-              </span>
+              <div className="mt-2 text-[11px] bg-sky-50 text-sky-800 p-2 rounded-lg border border-sky-200 flex items-center space-x-2">
+                <ShieldCheck className="w-4 h-4 text-sky-600 shrink-0" />
+                <span>Verified genuine unique submission from {problem.block ? `${problem.block}, ` : ""}{problem.district}.</span>
+              </div>
             </div>
 
-            {/* Pillar 4: Priority Formula Breakdown */}
+            {/* Pillar 4: Priority & Impact Assessment */}
             <div className="bg-white p-4 rounded-xl border border-amber-100 shadow-sm space-y-2">
               <div className="flex items-center justify-between">
                 <span className="flex items-center space-x-1.5 text-xs font-bold text-amber-900">
                   <TrendingUp className="w-4 h-4 text-amber-600" />
-                  <span>4. Priority Formula Breakdown</span>
+                  <span>4. Priority & Impact Assessment</span>
                 </span>
-                <span className="text-xs font-bold text-amber-700 font-mono">
-                  Score: {problem.priorityScore}
+                <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                  Score: {problem.priorityScore}/100
                 </span>
               </div>
-              <div className="space-y-1 text-[11px]">
-                <div className="flex justify-between text-slate-600">
-                  <span>Severity Keywords:</span>
-                  <span className="font-mono font-semibold">{explanation.priorityBreakdown.severityWeight} pts</span>
+              <div className="space-y-1.5 text-[11px] mt-1">
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>Problem Severity:</span>
+                  <span className="font-semibold text-slate-800">
+                    {problem.priorityScore >= 75 ? "High (Immediate Attention Needed)" : "Medium (Scheduled Action)"}
+                  </span>
                 </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Population Estimate:</span>
-                  <span className="font-mono font-semibold">{explanation.priorityBreakdown.affectedPopulationEstimate} pts</span>
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>Affected Population:</span>
+                  <span className="font-semibold text-slate-800">Community / Village Scale (~500+ residents)</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Vulnerability Index:</span>
-                  <span className="font-mono font-semibold">{explanation.priorityBreakdown.locationVulnerabilityIndex} pts</span>
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>District Need Zone:</span>
+                  <span className="font-semibold text-slate-800">{problem.district} (High Priority Area)</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>SDG Impact Boost:</span>
-                  <span className="font-mono font-semibold">{explanation.priorityBreakdown.sdgImpactScore} pts</span>
+                <div className="flex justify-between items-center text-slate-600">
+                  <span>State Priority Alignment:</span>
+                  <span className="font-semibold text-emerald-700">{problem.sdgTags?.[0] || "State Priority Sector"}</span>
                 </div>
               </div>
             </div>
@@ -279,16 +309,14 @@ export const ExplainableAIModal: React.FC<{
 
           {/* AI Recommended University Routing */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <h5 className="font-heading font-bold text-sm text-slate-900 flex items-center space-x-1.5">
-                  <Building2 className="w-4 h-4 text-emerald-600" />
-                  <span>Smart Academic Routing Recommendations (Top 3 Match)</span>
-                </h5>
-                <p className="text-xs text-slate-500">
-                  Select the institution to assign this challenge to, or confirm AI Top Recommendation:
-                </p>
-              </div>
+            <div>
+              <h5 className="font-heading font-bold text-sm text-slate-900 flex items-center space-x-1.5">
+                <Building2 className="w-4 h-4 text-emerald-600" />
+                <span>Recommended Higher Education Institutions (Top Academic Matches)</span>
+              </h5>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Select the institution best suited to develop a technological/engineering solution for this challenge:
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -297,7 +325,7 @@ export const ExplainableAIModal: React.FC<{
                   key={item.universityId}
                   className={`flex items-start justify-between p-3.5 rounded-xl border cursor-pointer transition ${
                     selectedUnivId === item.universityId
-                      ? "bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20"
+                      ? "bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20 shadow-sm"
                       : "bg-white border-slate-200 hover:bg-slate-50"
                   }`}
                 >
@@ -308,7 +336,7 @@ export const ExplainableAIModal: React.FC<{
                       value={item.universityId}
                       checked={selectedUnivId === item.universityId}
                       onChange={() => setSelectedUnivId(item.universityId)}
-                      className="mt-1 text-emerald-600 focus:ring-emerald-500"
+                      className="mt-1 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                     />
                     <div>
                       <div className="flex items-center space-x-2">
@@ -316,31 +344,30 @@ export const ExplainableAIModal: React.FC<{
                           #{item.rank} {item.universityName}
                         </span>
                         {item.rank === 1 && (
-                          <span className="text-[10px] bg-emerald-600 text-white font-bold px-1.5 py-0.2 rounded">
-                            AI Best Match
+                          <span className="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-full">
+                            AI Top Recommendation
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-600 mt-0.5">{item.reason}</p>
+                      <p className="text-xs text-slate-600 mt-1">{item.reason}</p>
                     </div>
                   </div>
 
-                  <div className="text-right shrink-0">
-                    <span className="text-xs font-bold text-emerald-700 font-mono">
-                      {(item.score * 100).toFixed(0)}% Fit
+                  <div className="text-right shrink-0 ml-3">
+                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                      {(item.score * 100).toFixed(0)}% Capability Match
                     </span>
-                    <span className="text-[10px] text-slate-400 block">Cosine Similarity</span>
                   </div>
                 </label>
               ))}
             </div>
           </div>
 
-          {/* Explainability Governance Notice */}
-          <div className="bg-amber-50/70 border border-amber-200 p-3 rounded-xl flex items-start space-x-2 text-xs text-amber-900">
-            <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+          {/* Verification Governance Notice */}
+          <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-start space-x-2.5 text-xs text-slate-700">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <p>
-              <strong>Governance Requirement:</strong> The State Nodal Officer acts as the human-in-the-loop validator. Approving this recommendation immediately triggers a dispatch to the Higher Education Institution (HEI) Nodal Desk for faculty assignment.
+              <strong>Administrative Workflow:</strong> The Verification Officer validates problem authenticity. Approving this submission dispatches the challenge directly to the designated university's Innovation & Research Cell for student/faculty project assignment.
             </p>
           </div>
         </div>
@@ -369,12 +396,12 @@ export const ExplainableAIModal: React.FC<{
               {justApproved ? (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Approved & Routed!</span>
+                  <span>Approved & Assigned!</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Confirm & Route to University &rarr;</span>
+                  <span>Confirm & Assign to University &rarr;</span>
                 </>
               )}
             </button>

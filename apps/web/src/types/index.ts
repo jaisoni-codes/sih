@@ -114,8 +114,30 @@ export interface Problem {
   };
   feedbackRating?: number;
   feedbackComment?: string;
+  source?: "website" | "whatsapp";
+  validationStatus?: "valid" | "invalid" | "needs_clarification" | "validation_in_progress";
+  originalVoiceTranscription?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export type ValidationStatus = "valid" | "invalid" | "needs_clarification" | "validation_in_progress";
+
+export interface ProblemValidationResult {
+  status: ValidationStatus;
+  isValid: boolean;
+  needsClarification: boolean;
+  reason: string;
+  clarificationPrompt?: string;
+  confidence: number;
+  detectedTheme?: ProblemCategory;
+  themeRelevanceScore: number;
+  imageAnalysis?: {
+    isValid: boolean;
+    confidence: number;
+    description: string;
+    matchesProblem: boolean;
+  };
 }
 
 export interface University {

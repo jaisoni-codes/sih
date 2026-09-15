@@ -17,6 +17,7 @@ import {
   PlusCircle,
   FileCheck
 } from "lucide-react";
+import { useT } from '../../i18n/useT';
 
 export const Navbar: React.FC = () => {
   const {
@@ -39,14 +40,16 @@ export const Navbar: React.FC = () => {
 
   const unreadNotifs = notifications.filter((n) => n.status !== "read");
 
+  const { t } = useT();
+
   const navLinks = [
-    { name: "Home", path: "/", icon: Layers },
-    { name: "Submit Challenge", path: "/submit", icon: PlusCircle },
-    { name: "My Challenges", path: "/my-problems", icon: FileCheck },
-    { name: "HEI Workspace", path: "/hei/dashboard", icon: GraduationCap },
-    { name: "Industry Marketplace", path: "/industry/marketplace", icon: Briefcase },
-    { name: "Govt Analytics", path: "/govt/dashboard", icon: BarChart3 },
-    { name: "Civic Leaderboard", path: "/leaderboard", icon: Award },
+    { name: t('nav_home'), path: '/', icon: Layers },
+    { name: t('nav_submit'), path: '/submit', icon: PlusCircle },
+    { name: t('nav_my_problems'), path: '/my-problems', icon: FileCheck },
+    { name: t('nav_hei_workspace'), path: '/hei/dashboard', icon: GraduationCap },
+    { name: t('nav_industry'), path: '/industry/marketplace', icon: Briefcase },
+    { name: t('nav_govt'), path: '/govt/dashboard', icon: BarChart3 },
+    { name: t('nav_leaderboard'), path: '/leaderboard', icon: Award },
   ];
 
   return (
@@ -56,11 +59,11 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center space-x-3">
           <span className="flex items-center space-x-1 font-semibold text-emerald-400">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live-dot inline-block"></span>
-            <span>Government of Jharkhand</span>
+            <span>{t('home_govt_strip')}</span>
           </span>
           <span className="text-slate-500">|</span>
           <span className="hidden sm:inline text-slate-300">
-            Department of Higher & Technical Education • SIH 2026
+            {t('home_dept_strip')}
           </span>
         </div>
 
@@ -70,12 +73,12 @@ export const Navbar: React.FC = () => {
             {isOnline ? (
               <span className="flex items-center space-x-1 text-emerald-400 text-xs">
                 <Wifi className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Online (Live Cloud Sync)</span>
+                <span className="hidden md:inline">{t('nav_online')}</span>
               </span>
             ) : (
               <span className="flex items-center space-x-1 text-amber-400 text-xs font-semibold">
                 <WifiOff className="w-3.5 h-3.5" />
-                <span>Offline Mode ({offlineQueue.length} queued)</span>
+                <span>{t('nav_offline')} ({offlineQueue.length} {t('nav_queued')})</span>
               </span>
             )}
           </div>

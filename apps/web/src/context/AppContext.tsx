@@ -98,6 +98,8 @@ export interface AppContextType {
   setChatbotOpen: (open: boolean) => void;
   whatsappSimulatorOpen: boolean;
   setWhatsappSimulatorOpen: (open: boolean) => void;
+  theme: "light" | "dark";
+  toggleTheme: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -364,6 +366,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [inspectingProblem, setInspectingProblem] = useState<Problem | null>(null);
   const [chatbotOpen, setChatbotOpen] = useState<boolean>(false);
   const [whatsappSimulatorOpen, setWhatsappSimulatorOpen] = useState<boolean>(false);
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    return (localStorage.getItem("jsicp_theme") as "light" | "dark") || "light";
+  });
+
+  const toggleTheme = () => {
+    setTheme(prev => {
+      const next = prev === "light" ? "dark" : "light";
+      localStorage.setItem("jsicp_theme", next);
+      if (next === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
 
 
   // Self-heal any existing or persisted problems in state so Healthcare/fever problems route to AIIMS Deoghar
@@ -1239,7 +1265,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         chatbotOpen,
         setChatbotOpen,
         whatsappSimulatorOpen,
-        setWhatsappSimulatorOpen
+        setWhatsappSimulatorOpen,
+        theme,
+        toggleTheme
       }}
     >
       {children}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useApp } from "../context/AppContext";
+import { useT } from '../i18n/useT';
 import { StatusPill } from "../components/common/StatusPill";
 import { SdgBadge } from "../components/common/SdgBadge";
 import {
@@ -22,7 +23,8 @@ import {
 } from "lucide-react";
 
 export const HomePage: React.FC = () => {
-  const { problems, universities, proposals, agreements, upvoteProblem, setSelectedDistrict } = useApp();
+  const { problems, universities, proposals, agreements, upvoteProblem, setSelectedDistrict, theme } = useApp();
+  const { t } = useT();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
 
@@ -41,26 +43,47 @@ export const HomePage: React.FC = () => {
   return (
     <div className="space-y-16 pb-12">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white pt-16 pb-24 px-4 sm:px-6 lg:px-8 rounded-b-3xl shadow-xl">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <section className={`relative overflow-hidden pt-16 pb-24 px-4 sm:px-6 lg:px-8 rounded-b-3xl shadow-xl ${
+        theme === 'dark'
+          ? 'bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white'
+          : 'bg-gradient-to-b from-emerald-50 via-white to-slate-50 text-slate-900'
+      }`}>
+        <div className={`absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px]`}></div>
 
         <div className="relative max-w-5xl mx-auto text-center space-y-6">
+          {/* Jharkhand Official Logo */}
+          <div className="flex justify-center mb-4">
+            <img
+              src="/jharkhand_gov_logo.png"
+              alt="Government of Jharkhand"
+              className="w-32 h-32 object-contain drop-shadow-2xl"
+            />
+          </div>
+
           {/* Official Badge */}
-          <div className="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1.5 rounded-full text-xs font-semibold text-emerald-300 backdrop-blur-sm animate-in fade-in slide-in-from-top-4">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span>Smart India Hackathon 2026 • Jharkhand Societal Innovation Track</span>
+          <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm animate-in fade-in slide-in-from-top-4 ${
+            theme === 'dark'
+              ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
+              : 'bg-emerald-100 border border-emerald-300 text-emerald-700'
+          }`}>
+            <Sparkles className="w-4 h-4 text-emerald-500" />
+            <span>{t('home_hero_badge')}</span>
           </div>
 
           {/* Master Heading */}
-          <h1 className="font-heading font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-tight">
-            Closing the Loop from <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">
-              Citizen Challenge &rarr; Academic Solution &rarr; Deployed Reality
+          <h1 className={`font-heading font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight leading-tight ${
+            theme === 'dark' ? 'text-white' : 'text-slate-900'
+          }`}>
+            {t('home_hero_heading_1')} <br />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500">
+              {t('home_hero_heading_2')}
             </span>
           </h1>
 
-          <p className="max-w-3xl mx-auto text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
-            An AI-enabled, 3-sided collaborative innovation ecosystem uniting <strong>Citizens & PRIs</strong>, <strong>Higher Education Institutions</strong> (BIT Mesra, IIT ISM, NIT, BAU), and <strong>Industry/CSR Partners</strong> across all 24 districts of Jharkhand.
+          <p className={`max-w-3xl mx-auto text-sm sm:text-base leading-relaxed font-normal ${
+            theme === 'dark' ? 'text-slate-300' : 'text-slate-600'
+          }`}>
+            {t('home_hero_subheading')}
           </p>
 
           {/* Quick CTA Actions */}
@@ -70,67 +93,212 @@ export const HomePage: React.FC = () => {
               className="flex items-center space-x-2 px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-500/30 transition hover:scale-105"
             >
               <PlusCircle className="w-5 h-5" />
-              <span>Submit a Societal Challenge</span>
+              <span>{t('home_cta_submit')}</span>
             </Link>
 
             <Link
               to="/my-problems"
-              className="flex items-center space-x-2 px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-sm font-semibold transition"
+              className={`flex items-center space-x-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition border ${
+                theme === 'dark'
+                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300 shadow-sm'
+              }`}
             >
-              <span>Track Challenge Status</span>
+              <span>{t('home_cta_track')}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
             <Link
               to="/industry/marketplace"
-              className="flex items-center space-x-2 px-6 py-3.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-xl text-sm font-semibold transition"
+              className={`flex items-center space-x-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition border ${
+                theme === 'dark'
+                  ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border-amber-500/30'
+                  : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-300'
+              }`}
             >
               <Briefcase className="w-4 h-4" />
-              <span>Industry & CSR Marketplace</span>
+              <span>{t('home_cta_industry')}</span>
             </Link>
           </div>
         </div>
 
         {/* Live Metrics Ribbon */}
         <div className="relative max-w-6xl mx-auto mt-14 grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
-          <div className="bg-white/5 border border-white/10 backdrop-blur-md p-4 rounded-2xl">
-            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-emerald-400 block font-mono">
+          <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-white/5 border border-white/10 backdrop-blur-md' : 'bg-white border border-emerald-100 shadow-sm'}`}>
+            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-emerald-500 block font-mono">
               {problems.length + 580}
             </span>
-            <span className="text-xs text-slate-300 font-medium">Challenges Submitted</span>
+            <span className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>{t('home_metric_challenges')}</span>
           </div>
 
-          <div className="bg-white/5 border border-white/10 backdrop-blur-md p-4 rounded-2xl">
-            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-teal-300 block font-mono">
+          <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-white/5 border border-white/10 backdrop-blur-md' : 'bg-white border border-teal-100 shadow-sm'}`}>
+            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-teal-500 block font-mono">
               24 / 24
             </span>
-            <span className="text-xs text-slate-300 font-medium">Districts Covered</span>
+            <span className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>{t('home_metric_districts')}</span>
           </div>
 
-          <div className="bg-white/5 border border-white/10 backdrop-blur-md p-4 rounded-2xl">
-            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-blue-400 block font-mono">
+          <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-white/5 border border-white/10 backdrop-blur-md' : 'bg-white border border-blue-100 shadow-sm'}`}>
+            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-blue-500 block font-mono">
               {universities.length} HEIs
             </span>
-            <span className="text-xs text-slate-300 font-medium">BIT, IIT, NIT, BAU</span>
+            <span className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>{t('home_metric_universities')}</span>
           </div>
 
-          <div className="bg-white/5 border border-white/10 backdrop-blur-md p-4 rounded-2xl">
-            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-amber-400 block font-mono">
+          <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-white/5 border border-white/10 backdrop-blur-md' : 'bg-white border border-amber-100 shadow-sm'}`}>
+            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-amber-500 block font-mono">
               ₹{(totalFundsMobilized / 100000 + 45.2).toFixed(1)} L
             </span>
-            <span className="text-xs text-slate-300 font-medium">CSR Funds Mobilized</span>
+            <span className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>{t('home_metric_funds')}</span>
           </div>
 
-          <div className="bg-white/5 border border-white/10 backdrop-blur-md p-4 rounded-2xl col-span-2 md:col-span-1">
-            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-purple-400 block font-mono">
+          <div className={`p-4 rounded-2xl col-span-2 md:col-span-1 ${theme === 'dark' ? 'bg-white/5 border border-white/10 backdrop-blur-md' : 'bg-white border border-purple-100 shadow-sm'}`}>
+            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-purple-500 block font-mono">
               {resolvedCount + 142}
             </span>
-            <span className="text-xs text-slate-300 font-medium">Deployed Solutions</span>
+            <span className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>{t('home_metric_resolved')}</span>
           </div>
         </div>
       </section>
 
+
       {/* 3-Sided Workflow Architecture Banner */}
+      {/* ─── Jharkhand at a Glance (Data source: jharkhand.gov.in) ─── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center space-y-2 mb-8">
+          <span className="inline-flex items-center space-x-2 bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+            <span>🏛</span>
+            <span>शासन एवं नेतृत्व | Governance &amp; Leadership</span>
+          </span>
+          <h2 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900">
+            Jharkhand at a Glance
+          </h2>
+          <p className="text-sm text-slate-500 max-w-2xl mx-auto">
+            Jharkhand ("The land of forest") — Created on 15 November 2000. Area 79,714 km², 24 Districts, Capital: Ranchi. Borders Bihar, UP, Chhattisgarh, Odisha &amp; West Bengal.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+          {/* Card 1 — About Jharkhand */}
+          <a href="https://jharkhand.gov.in/Home/AboutState" target="_blank" rel="noopener noreferrer"
+            className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-emerald-300 transition p-5 flex flex-col space-y-3 group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">About Jharkhand</span>
+              <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold">State</span>
+            </div>
+            <div className="w-full h-24 bg-gradient-to-br from-emerald-50 to-teal-100 rounded-xl flex items-center justify-center group-hover:from-emerald-100 transition">
+              <MapPin className="w-10 h-10 text-emerald-600 opacity-60" />
+            </div>
+            <div className="space-y-1.5 text-xs flex-1">
+              <div className="flex justify-between text-slate-600"><span>Capital</span><span className="font-semibold text-slate-800">Ranchi</span></div>
+              <div className="flex justify-between text-slate-600"><span>Sub Capital</span><span className="font-semibold text-slate-800">Dumka</span></div>
+              <div className="flex justify-between text-slate-600"><span>Area</span><span className="font-semibold text-slate-800">79,714 km²</span></div>
+              <div className="flex justify-between text-slate-600"><span>Districts</span><span className="font-semibold text-slate-800">24</span></div>
+              <div className="flex justify-between text-slate-600"><span>Population</span><span className="font-semibold text-slate-800">3.3 Crores</span></div>
+              <div className="flex justify-between text-slate-600"><span>Founded</span><span className="font-semibold text-slate-800">15 Nov 2000</span></div>
+            </div>
+            <div className="flex items-center space-x-1 text-emerald-600 text-xs font-semibold pt-2 border-t border-slate-100">
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span>jharkhand.gov.in ↗</span>
+            </div>
+          </a>
+
+          {/* Card 2 — Governor (Source: jharkhand.gov.in → rajbhavanjharkhand.nic.in) */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition p-5 flex flex-col space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Governor</span>
+              <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold">Apex</span>
+            </div>
+            <div className="flex justify-center">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl font-extrabold shadow-md select-none">
+                SKG
+              </div>
+            </div>
+            <div className="text-center space-y-0.5 flex-1">
+              <p className="font-bold text-sm text-slate-800">Shri Santosh Kumar Gangwar</p>
+              <p className="text-xs text-slate-500">Hon'ble Governor of Jharkhand</p>
+            </div>
+            <div className="flex items-center justify-center space-x-3 pt-2 border-t border-slate-100">
+              <a href="https://rajbhavanjharkhand.nic.in/about-department/honble-governors-profile/"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center space-x-1 text-xs text-emerald-600 font-semibold hover:underline">
+                <Users className="w-3 h-3" /><span>Profile ↗</span>
+              </a>
+              <span className="text-slate-300">|</span>
+              <a href="https://rajbhavanjharkhand.nic.in/"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center space-x-1 text-xs text-slate-500 hover:underline">
+                <ChevronRight className="w-3 h-3" /><span>Raj Bhavan ↗</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Card 3 — Chief Minister (Source: jharkhand.gov.in → cm.jharkhand.gov.in) */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition p-5 flex flex-col space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Chief Minister</span>
+              <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Executive</span>
+            </div>
+            <div className="flex justify-center">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl font-extrabold shadow-md select-none">
+                HS
+              </div>
+            </div>
+            <div className="text-center space-y-0.5 flex-1">
+              <p className="font-bold text-sm text-slate-800">Shri Hemant Soren</p>
+              <p className="text-xs text-slate-500">Hon'ble Chief Minister of Jharkhand</p>
+            </div>
+            <div className="flex items-center justify-center space-x-3 pt-2 border-t border-slate-100">
+              <a href="https://cm.jharkhand.gov.in/"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center space-x-1 text-xs text-emerald-600 font-semibold hover:underline">
+                <Users className="w-3 h-3" /><span>Profile ↗</span>
+              </a>
+              <span className="text-slate-300">|</span>
+              <a href="https://cm.jharkhand.gov.in/"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center space-x-1 text-xs text-slate-500 hover:underline">
+                <ChevronRight className="w-3 h-3" /><span>CM Office ↗</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Card 4 — Chief Secretary (Source: jharkhand.gov.in) */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition p-5 flex flex-col space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Chief Secretary</span>
+              <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">Administration</span>
+            </div>
+            <div className="flex justify-center">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-extrabold shadow-md select-none">
+                AK
+              </div>
+            </div>
+            <div className="text-center space-y-0.5 flex-1">
+              <p className="font-bold text-sm text-slate-800">Shri Avinash Kumar</p>
+              <p className="text-xs text-slate-500">Chief Secretary, Govt. of Jharkhand</p>
+            </div>
+            <div className="flex items-center justify-center space-x-3 pt-2 border-t border-slate-100">
+              <a href="https://jharkhand.gov.in/Home/WebDirectory"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center space-x-1 text-xs text-emerald-600 font-semibold hover:underline">
+                <Users className="w-3 h-3" /><span>Who's Who ↗</span>
+              </a>
+              <span className="text-slate-300">|</span>
+              <a href="https://jharkhand.gov.in/Home/Department"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center space-x-1 text-xs text-slate-500 hover:underline">
+                <ChevronRight className="w-3 h-3" /><span>Secretariat ↗</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      {/* ─── How JSICP Works ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-2 mb-10">
           <span className="text-xs uppercase font-bold text-emerald-600 tracking-wider">

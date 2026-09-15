@@ -10,19 +10,43 @@ import {
   Globe,
   Bell,
   FileCheck,
-  MessageSquare
+  MessageSquare,
+  Sun,
+  Moon
 } from "lucide-react";
-import { t } from "../../i18n/translations";
+import { useT } from '../../i18n/useT';
 
 export const GovtHeader: React.FC = () => {
   const { currentUser, isAuthenticated, logout, loginAsRole, demoUsers } = useAuth();
-  const { currentLanguage, setCurrentLanguage, notifications, markNotificationAsRead, setWhatsappSimulatorOpen } = useApp();
+  const { currentLanguage, setCurrentLanguage, notifications, markNotificationAsRead, setWhatsappSimulatorOpen, theme, toggleTheme } = useApp();
+  const { t } = useT();
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
-  const [fontSize, setFontSize] = useState<"normal" | "large" | "larger">("normal");
+  const [fontSize, setFontSize] = useState<"normal" | "large" | "larger">(() => {
+    return (localStorage.getItem("jsicp_font_size") as "normal" | "large" | "larger") || "normal";
+  });
 
   const navigate = useNavigate();
+
+  // Apply font size to document whenever it changes
+  const applyFontSize = (size: "normal" | "large" | "larger") => {
+    setFontSize(size);
+    localStorage.setItem("jsicp_font_size", size);
+    if (size === "normal") {
+      document.documentElement.style.fontSize = "16px";
+    } else if (size === "large") {
+      document.documentElement.style.fontSize = "19px";
+    } else {
+      document.documentElement.style.fontSize = "22px";
+    }
+  };
+
+  // Apply on mount from saved preference
+  React.useEffect(() => {
+    const saved = (localStorage.getItem("jsicp_font_size") as "normal" | "large" | "larger") || "normal";
+    applyFontSize(saved);
+  }, []);
 
   const handleRoleSwitch = (roleKey: any) => {
     loginAsRole(roleKey);
@@ -37,39 +61,66 @@ export const GovtHeader: React.FC = () => {
       {/* 1. Top Government of India & Jharkhand Strip */}
       <div className="bg-[#0b1d33] text-slate-200 text-[11px] px-4 sm:px-8 py-1.5 flex flex-wrap items-center justify-between border-b border-[#163b5f]">
         <div className="flex items-center space-x-3">
-          <span className="font-semibold text-slate-100 flex items-center space-x-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
-            <span>झारखंड सरकार | Government of Jharkhand</span>
+          <span className="flex items-center space-x-2.5">
+            <img
+              src="/jharkhand_gov_logo.png"
+              alt="Government of Jharkhand"
+              className="h-9 w-9 object-contain shrink-0"
+            />
+            <span className="font-semibold text-slate-100 text-[11px]">{t('home_govt_strip')}</span>
           </span>
           <span className="text-slate-500">|</span>
           <span className="text-slate-300 hidden md:inline">
-            उच्च एवं तकनीकी शिक्षा विभाग (Dept. of Higher & Technical Education)
+            {t('dept_higher_tech_edu')}
           </span>
         </div>
 
         {/* Accessibility & Language */}
         <div className="flex items-center space-x-3">
           <div className="hidden sm:flex items-center space-x-1 text-slate-300 text-[10px]">
-            <span>Font Size:</span>
+            <span>{t('header_font_size')}</span>
             <button
-              onClick={() => setFontSize("normal")}
+              onClick={() => applyFontSize("normal")}
               className={`px-1 rounded hover:bg-slate-800 ${fontSize === "normal" ? "font-bold text-white bg-slate-800" : ""}`}
             >
               A-
             </button>
             <button
-              onClick={() => setFontSize("large")}
+              onClick={() => applyFontSize("large")}
               className={`px-1 rounded hover:bg-slate-800 ${fontSize === "large" ? "font-bold text-white bg-slate-800" : ""}`}
             >
               A
             </button>
             <button
-              onClick={() => setFontSize("larger")}
+              onClick={() => applyFontSize("larger")}
               className={`px-1 rounded hover:bg-slate-800 ${fontSize === "larger" ? "font-bold text-white bg-slate-800" : ""}`}
             >
               A+
             </button>
           </div>
+
+          {/* Dark / Light Mode Toggle */}
+          <button
+            onClick={toggleTheme}
+            title={theme === "light" ? "Current: Light Mode (Click for Dark)" : "Current: Dark Mode (Click for Light)"}
+            className={`flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full transition text-[11px] font-medium border ${
+              theme === "light"
+                ? "bg-amber-400/10 text-amber-300 border-amber-400/30 hover:bg-amber-400/20"
+                : "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700"
+            }`}
+          >
+            {theme === "light" ? (
+              <>
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <span>Light</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-3.5 h-3.5 text-blue-300" />
+                <span>Dark</span>
+              </>
+            )}
+          </button>
 
           <span className="text-slate-600 hidden sm:inline">|</span>
 
@@ -119,25 +170,26 @@ export const GovtHeader: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
           {/* Logo & Seal */}
-          <Link to="/" className="flex items-center space-x-3.5 group">
-            <div className="w-11 h-11 rounded bg-[#0f2942] text-white flex flex-col items-center justify-center font-serif font-bold text-xs tracking-wider border border-[#1e3a5f] shrink-0">
-              <span className="text-[9px] uppercase font-sans text-amber-400 font-semibold tracking-tighter">GOVT OF</span>
-              <span className="text-sm leading-none font-bold text-white">JH</span>
-            </div>
+          <Link to="/" className="flex items-center space-x-4 group">
+            <img
+              src="/jharkhand_gov_logo.png"
+              alt="Government of Jharkhand"
+              className="w-16 h-16 object-contain shrink-0 drop-shadow-md"
+            />
             <div>
               <div className="flex items-center space-x-2">
                 <span className="font-heading font-extrabold text-base sm:text-lg text-[#0f2942] tracking-tight">
                   JSICP
                 </span>
                 <span className="bg-[#f1f5f9] text-[#0f2942] text-[10px] font-bold px-2 py-0.5 rounded border border-slate-300">
-                  झारखंड पोर्टल
+                  {t("header_portal_badge")}
                 </span>
               </div>
               <p className="text-xs text-slate-700 font-medium leading-tight">
-                झारखंड सामाजिक नवाचार सहयोग पोर्टल
+                {t("portal_name")}
               </p>
               <p className="text-[10px] text-slate-500 hidden sm:block">
-                Jharkhand Societal Innovation Collaboration Portal • SIH 2026
+                {t("portal_tagline")}
               </p>
             </div>
           </Link>
@@ -151,7 +203,7 @@ export const GovtHeader: React.FC = () => {
               title="Report problem via WhatsApp simulator"
             >
               <MessageSquare className="w-3.5 h-3.5 fill-current" />
-              <span className="hidden sm:inline">{t("report_via_whatsapp", currentLanguage)}</span>
+              <span className="hidden sm:inline">{t("report_via_whatsapp")}</span>
               <span className="sm:hidden">WhatsApp</span>
             </button>
 
@@ -175,8 +227,8 @@ export const GovtHeader: React.FC = () => {
                   {notifDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-80 bg-white rounded shadow-xl border border-slate-200 py-2 z-50 text-xs">
                       <div className="px-3 py-2 border-b border-slate-100 font-bold text-slate-800 flex justify-between">
-                        <span>Official Alerts</span>
-                        <span className="text-slate-500 font-normal">{notifications.length} total</span>
+                        <span>{t("header_alerts")}</span>
+                        <span className="text-slate-500 font-normal">{notifications.length} {t("header_total")}</span>
                       </div>
                       <div className="max-h-60 overflow-y-auto divide-y divide-slate-100">
                         {notifications.slice(0, 4).map((n) => (
@@ -228,7 +280,7 @@ export const GovtHeader: React.FC = () => {
                     <div className="absolute right-0 mt-2 w-80 bg-white rounded shadow-xl border border-slate-200 py-2 z-50 text-xs">
                       <div className="px-3.5 py-2 border-b border-slate-100 bg-slate-50 text-slate-700">
                         <span className="font-bold text-[11px] text-slate-800 uppercase tracking-wider block">
-                          Switch Dedicated Stakeholder Portal:
+                          {t("header_switch_portal")}
                         </span>
                         <p className="text-[11px] text-slate-500 mt-0.5">
                           Test the system from each actor isolated workspace:
@@ -313,7 +365,7 @@ export const GovtHeader: React.FC = () => {
                           className="flex items-center space-x-1 text-rose-700 hover:text-rose-900 font-semibold"
                         >
                           <LogOut className="w-3.5 h-3.5" />
-                          <span>Sign Out</span>
+                          <span>{t("header_sign_out")}</span>
                         </button>
                         <span className="text-[10px] text-slate-400 font-mono">DigiLocker SSO</span>
                       </div>
@@ -328,14 +380,14 @@ export const GovtHeader: React.FC = () => {
                   className="hidden sm:inline-flex items-center space-x-1 px-3 py-1.5 border border-slate-300 rounded text-xs font-semibold text-slate-700 hover:bg-slate-50"
                 >
                   <FileCheck className="w-3.5 h-3.5" />
-                  <span>Track Complaint</span>
+                  <span>{t("landing_cta_track")}</span>
                 </Link>
                 <Link
                   to="/login"
                   className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-[#0f2942] hover:bg-[#163b5f] text-white rounded text-xs font-semibold shadow-xs"
                 >
                   <UserIcon className="w-3.5 h-3.5" />
-                  <span>Sign In / Parichay SSO</span>
+                  <span>{t("header_sign_in")}</span>
                 </Link>
               </div>
             )}

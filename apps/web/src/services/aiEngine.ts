@@ -361,7 +361,8 @@ function matchesKeyword(kw: string, text: string): boolean {
   return pattern.test(text);
 }
 
-const API_BASE = "http://127.0.0.1:8000";
+const isProduction = typeof window !== "undefined" && (window.location.protocol === "https:" || !window.location.hostname.includes("localhost"));
+const API_BASE = isProduction ? "/api" : "http://127.0.0.1:8000";
 
 export const aiEngine = {
   /**

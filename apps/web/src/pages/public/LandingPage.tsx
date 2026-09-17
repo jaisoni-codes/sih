@@ -12,7 +12,10 @@ import {
   Briefcase,
   ShieldCheck,
   ArrowRight,
-  Users
+  Users,
+  ExternalLink,
+  User,
+  Download
 } from "lucide-react";
 
 export const LandingPage: React.FC = () => {
@@ -107,6 +110,242 @@ export const LandingPage: React.FC = () => {
 
               <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500">
                 {t("landing_stat_verified")}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Jharkhand at a Glance — Governance & Leadership */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div className="text-center space-y-2">
+            <div className="flex justify-center">
+              <span className="inline-flex items-center space-x-1.5 bg-amber-50 text-amber-800 border border-amber-200/80 px-3 py-1 rounded-full text-xs font-semibold">
+                <span>🏛</span>
+                <span>शासन एवं नेतृत्व | GOVERNANCE &amp; LEADERSHIP</span>
+              </span>
+            </div>
+            <h2 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-white tracking-tight">
+              JHARKHAND AT A GLANCE
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+              Jharkhand is an eastern Indian state. It is famous for its waterfalls, the elegant Jain temples of Parasnath Hill, and the elephants and tigers of Betla National Park.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* Card 1: About Jharkhand */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:scale-[1.03] hover:shadow-xl group">
+              <div>
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    ABOUT JHARKHAND
+                  </span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                    State
+                  </span>
+                </div>
+
+                <div className="py-2 flex items-center justify-center">
+                  <img
+                    src="/governance/jharkhand_map.png"
+                    alt="Jharkhand District Map"
+                    className="h-24 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+
+                <div className="space-y-1.5 text-xs pt-2 border-t border-slate-100">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Capital</span>
+                    <span className="font-bold text-slate-900">Ranchi</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Area</span>
+                    <span className="font-bold text-slate-900">79,714 sq km</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Districts</span>
+                    <span className="font-bold text-slate-900">24</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Population</span>
+                    <span className="font-bold text-slate-900">3.3 Crores</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-2">
+                <a
+                  href="https://jharkhand.gov.in/Home/AboutState"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2 px-3 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center justify-center space-x-1.5 transition shadow-2xs"
+                >
+                  <span>Official Portal</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                </a>
+              </div>
+            </div>
+
+            {/* Card 2: Governor */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:scale-[1.03] hover:shadow-xl group">
+              <div>
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    GOVERNOR
+                  </span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                    Apex
+                  </span>
+                </div>
+
+                <div className="py-3 flex justify-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                    <img
+                      src="/governance/governor_santosh_gangwar.png"
+                      alt="Shri Santosh Kumar Gangwar"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-center space-y-1">
+                  <h4 className="font-bold text-sm text-slate-900 leading-snug">
+                    Shri Santosh Kumar Gangwar
+                  </h4>
+                  <p className="text-xs text-slate-500">
+                    Hon'ble Governor of Jharkhand
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-2 flex items-center space-x-2">
+                <a
+                  href="https://rajbhavanjharkhand.nic.in/about-department/honble-governors-profile/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
+                >
+                  <User className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Profile</span>
+                </a>
+                <a
+                  href="/governance/governor_santosh_gangwar.png"
+                  download="Governor_Santosh_Kumar_Gangwar.png"
+                  className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
+                >
+                  <Download className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Download Photo</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Card 3: Chief Minister */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:scale-[1.03] hover:shadow-xl group">
+              <div>
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    CHIEF MINISTER
+                  </span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Executive
+                  </span>
+                </div>
+
+                <div className="py-3 flex justify-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                    <img
+                      src="/governance/cm_hemant_soren.png"
+                      alt="Shri Hemant Soren"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-center space-y-1">
+                  <h4 className="font-bold text-sm text-slate-900 leading-snug">
+                    Shri Hemant Soren
+                  </h4>
+                  <p className="text-xs text-slate-500">
+                    Hon'ble Chief Minister of Jharkhand
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-2 flex items-center space-x-2">
+                <a
+                  href="https://cm.jharkhand.gov.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
+                >
+                  <User className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Profile</span>
+                </a>
+                <a
+                  href="https://jharkhand.gov.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Official Portal</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Card 4: Chief Secretary */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:scale-[1.03] hover:shadow-xl group">
+              <div>
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    CHIEF SECRETARY
+                  </span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                    Administration
+                  </span>
+                </div>
+
+                <div className="py-3 flex justify-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                    <img
+                      src="/governance/cs_avinash_kumar.png"
+                      alt="Shri Avinash Kumar"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-center space-y-1">
+                  <h4 className="font-bold text-sm text-slate-900 leading-snug">
+                    Shri Avinash Kumar
+                  </h4>
+                  <p className="text-xs text-slate-500">
+                    Chief Secretary, Government of Jharkhand
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-2 flex items-center space-x-2">
+                <a
+                  href="https://jharkhand.gov.in/Home/WebDirectory"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
+                >
+                  <User className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Profile</span>
+                </a>
+                <a
+                  href="https://jharkhand.gov.in/Home/WebDirectory"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Secretariat</span>
+                </a>
               </div>
             </div>
           </div>

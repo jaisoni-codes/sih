@@ -1588,61 +1588,7 @@ export const WhatsAppSimulatorModal: React.FC = () => {
                 </button>
               </div>
 
-              {/* Interactive Regional Voice Note Test Buttons */}
-              <div className="w-full max-w-xs pt-2 border-t border-slate-300/80">
-                <span className="text-[10px] uppercase tracking-wider font-bold text-slate-600 block mb-1 text-center">
-                  🎙️ Test Regional Voice Grievance (1-Tap Demo):
-                </span>
-                <div className="grid grid-cols-2 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setChatLang("nagpuri");
-                      const nagText = "हमार गाँव में चापाकल खराब हवे, 15 दिन से पानी नइखे मिलत, सब कोई परेशान बा";
-                      const voiceMsg: ChatMessage = {
-                        id: `msg-${Date.now()}`,
-                        sender: "user",
-                        text: nagText,
-                        time: getCurrentTime(),
-                        isVoiceNote: true,
-                        voiceDuration: "0:05"
-                      };
-                      setMessages([voiceMsg]);
-                      setTimeout(() => {
-                        handleSendMessage(nagText);
-                      }, 300);
-                    }}
-                    className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-[10px] font-semibold text-left leading-tight transition shadow-2xs"
-                  >
-                    <span className="block font-bold">🌾 नागपुरी Voice</span>
-                    <span className="text-[9px] text-amber-700 truncate block">"चापाकल खराब हवे..."</span>
-                  </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setChatLang("santali");
-                      const satText = "ᱟᱞᱮᱭᱟᱜ ᱟᱹᱛᱩ ᱨᱮ ᱫᱟᱜ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱢᱮᱱᱟᱜᱼᱟ, ᱦᱚᱨ ᱵᱟᱹᱲᱤᱡ ᱜᱮᱭᱟ (Aleyag aatu re daah etketone menaga)";
-                      const voiceMsg: ChatMessage = {
-                        id: `msg-${Date.now()}`,
-                        sender: "user",
-                        text: satText,
-                        time: getCurrentTime(),
-                        isVoiceNote: true,
-                        voiceDuration: "0:06"
-                      };
-                      setMessages([voiceMsg]);
-                      setTimeout(() => {
-                        handleSendMessage(satText);
-                      }, 300);
-                    }}
-                    className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] font-semibold text-left leading-tight transition shadow-2xs"
-                  >
-                    <span className="block font-bold">🏹 ᱥᱟᱱᱛᱟᱲᱤ Voice</span>
-                    <span className="text-[9px] text-emerald-700 truncate block">"ᱫᱟᱜ ᱮᱴᱠᱮᱴᱚᱬᱮ..."</span>
-                  </button>
-                </div>
-              </div>
             </div>
           )}
 

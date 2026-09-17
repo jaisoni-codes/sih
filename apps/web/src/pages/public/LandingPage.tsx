@@ -147,11 +147,11 @@ export const LandingPage: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="py-2 flex items-center justify-center">
+                <div className="py-2 flex items-center justify-center h-28">
                   <img
                     src="/governance/jharkhand_map.png"
                     alt="Jharkhand District Map"
-                    className="h-24 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                    className="max-h-24 max-w-[140px] w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-sm"
                   />
                 </div>
 
@@ -200,17 +200,17 @@ export const LandingPage: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="py-3 flex justify-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                <div className="py-2 flex justify-center items-center h-28">
+                  <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-amber-400/30 to-slate-200 shadow-md ring-2 ring-amber-500/30 group-hover:ring-amber-500/70 transition-all flex items-center justify-center">
                     <img
                       src="/governance/governor_santosh_gangwar.png"
                       alt="Shri Santosh Kumar Gangwar"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full rounded-full object-cover object-center shadow-inner"
                     />
                   </div>
                 </div>
 
-                <div className="text-center space-y-1">
+                <div className="text-center space-y-1 mt-1">
                   <h4 className="font-bold text-sm text-slate-900 leading-snug">
                     Shri Santosh Kumar Gangwar
                   </h4>
@@ -236,7 +236,7 @@ export const LandingPage: React.FC = () => {
                   className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
                 >
                   <Download className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Download Photo</span>
+                  <span>Photo</span>
                 </a>
               </div>
             </div>
@@ -253,17 +253,17 @@ export const LandingPage: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="py-3 flex justify-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                <div className="py-2 flex justify-center items-center h-28">
+                  <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-emerald-500/30 to-slate-200 shadow-md ring-2 ring-emerald-500/30 group-hover:ring-emerald-500/70 transition-all flex items-center justify-center">
                     <img
                       src="/governance/cm_hemant_soren.png"
                       alt="Shri Hemant Soren"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full rounded-full object-cover object-center shadow-inner"
                     />
                   </div>
                 </div>
 
-                <div className="text-center space-y-1">
+                <div className="text-center space-y-1 mt-1">
                   <h4 className="font-bold text-sm text-slate-900 leading-snug">
                     Shri Hemant Soren
                   </h4>
@@ -307,17 +307,17 @@ export const LandingPage: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="py-3 flex justify-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                <div className="py-2 flex justify-center items-center h-28">
+                  <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-blue-500/30 to-slate-200 shadow-md ring-2 ring-blue-500/30 group-hover:ring-blue-500/70 transition-all flex items-center justify-center">
                     <img
                       src="/governance/cs_avinash_kumar.png"
                       alt="Shri Avinash Kumar"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full rounded-full object-cover object-center shadow-inner"
                     />
                   </div>
                 </div>
 
-                <div className="text-center space-y-1">
+                <div className="text-center space-y-1 mt-1">
                   <h4 className="font-bold text-sm text-slate-900 leading-snug">
                     Shri Avinash Kumar
                   </h4>

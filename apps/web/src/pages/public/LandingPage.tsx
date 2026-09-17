@@ -54,7 +54,7 @@ export const LandingPage: React.FC = () => {
               </div>
 
               <h1 className="font-heading font-extrabold text-2xl sm:text-3xl lg:text-4xl text-[#0f2942] tracking-tight leading-tight">
-                {t("landing_title")}
+                {t("landing_title")} (JSICP)
               </h1>
 
               <p className="text-slate-600 text-sm leading-relaxed max-w-2xl">
@@ -119,15 +119,14 @@ export const LandingPage: React.FC = () => {
           <div className="text-center space-y-2">
             <div className="flex justify-center">
               <span className="inline-flex items-center space-x-1.5 bg-amber-50 text-amber-800 border border-amber-200/80 px-3 py-1 rounded-full text-xs font-semibold">
-                <span>🏛</span>
-                <span>शासन एवं नेतृत्व | GOVERNANCE &amp; LEADERSHIP</span>
+                <span>{t("gov_badge")}</span>
               </span>
             </div>
             <h2 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-white tracking-tight">
-              JHARKHAND AT A GLANCE
+              {t("gov_heading")}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
-              Jharkhand is an eastern Indian state. It is famous for its waterfalls, the elegant Jain temples of Parasnath Hill, and the elephants and tigers of Betla National Park.
+              {t("gov_subheading")}
             </p>
           </div>
 
@@ -137,10 +136,10 @@ export const LandingPage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                   <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    ABOUT JHARKHAND
+                    {t("gov_card_about_title")}
                   </span>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                    State
+                    {t("gov_card_about_badge")}
                   </span>
                 </div>
 
@@ -154,20 +153,20 @@ export const LandingPage: React.FC = () => {
 
                 <div className="space-y-1.5 text-xs pt-2 border-t border-slate-100">
                   <div className="flex justify-between text-slate-600">
-                    <span>Capital</span>
-                    <span className="font-bold text-slate-900">Ranchi</span>
+                    <span>{t("gov_capital")}</span>
+                    <span className="font-bold text-slate-900">{t("gov_capital_val")}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
-                    <span>Area</span>
-                    <span className="font-bold text-slate-900">79,714 sq km</span>
+                    <span>{t("gov_area")}</span>
+                    <span className="font-bold text-slate-900">{t("gov_area_val")}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
-                    <span>Districts</span>
-                    <span className="font-bold text-slate-900">24</span>
+                    <span>{t("gov_districts")}</span>
+                    <span className="font-bold text-slate-900">{t("gov_districts_val")}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
-                    <span>Population</span>
-                    <span className="font-bold text-slate-900">3.3 Crores</span>
+                    <span>{t("gov_population")}</span>
+                    <span className="font-bold text-slate-900">{t("gov_population_val")}</span>
                   </div>
                 </div>
               </div>
@@ -179,7 +178,7 @@ export const LandingPage: React.FC = () => {
                   rel="noopener noreferrer"
                   className="w-full py-2 px-3 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center justify-center space-x-1.5 transition shadow-2xs"
                 >
-                  <span>Official Portal</span>
+                  <span>{t("gov_official_portal")}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                 </a>
               </div>
@@ -190,10 +189,10 @@ export const LandingPage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                   <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    GOVERNOR
+                    {t("gov_card_gov_title")}
                   </span>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
-                    Apex
+                    {t("gov_card_gov_badge")}
                   </span>
                 </div>
 
@@ -209,10 +208,10 @@ export const LandingPage: React.FC = () => {
 
                 <div className="text-center space-y-1 mt-1">
                   <h4 className="font-bold text-sm text-slate-900 leading-snug">
-                    Shri Santosh Kumar Gangwar
+                    {t("gov_governor_name")}
                   </h4>
                   <p className="text-xs text-slate-500">
-                    Hon'ble Governor of Jharkhand
+                    {t("gov_governor_role")}
                   </p>
                 </div>
               </div>
@@ -225,7 +224,7 @@ export const LandingPage: React.FC = () => {
                   className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
                 >
                   <User className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Profile</span>
+                  <span>{t("gov_profile_btn")}</span>
                 </a>
                 <a
                   href="/governance/governor_santosh_gangwar.png"
@@ -233,7 +232,7 @@ export const LandingPage: React.FC = () => {
                   className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
                 >
                   <Download className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Photo</span>
+                  <span>{t("gov_photo_btn")}</span>
                 </a>
               </div>
             </div>
@@ -243,10 +242,10 @@ export const LandingPage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                   <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    CHIEF MINISTER
+                    {t("gov_card_cm_title")}
                   </span>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    Executive
+                    {t("gov_card_cm_badge")}
                   </span>
                 </div>
 
@@ -262,10 +261,10 @@ export const LandingPage: React.FC = () => {
 
                 <div className="text-center space-y-1 mt-1">
                   <h4 className="font-bold text-sm text-slate-900 leading-snug">
-                    Shri Hemant Soren
+                    {t("gov_cm_name")}
                   </h4>
                   <p className="text-xs text-slate-500">
-                    Hon'ble Chief Minister of Jharkhand
+                    {t("gov_cm_role")}
                   </p>
                 </div>
               </div>
@@ -278,7 +277,7 @@ export const LandingPage: React.FC = () => {
                   className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
                 >
                   <User className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Profile</span>
+                  <span>{t("gov_profile_btn")}</span>
                 </a>
                 <a
                   href="https://jharkhand.gov.in/"
@@ -287,7 +286,7 @@ export const LandingPage: React.FC = () => {
                   className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Official Portal</span>
+                  <span>{t("gov_official_portal")}</span>
                 </a>
               </div>
             </div>
@@ -297,10 +296,10 @@ export const LandingPage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                   <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    CHIEF SECRETARY
+                    {t("gov_card_cs_title")}
                   </span>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                    Administration
+                    {t("gov_card_cs_badge")}
                   </span>
                 </div>
 
@@ -316,10 +315,10 @@ export const LandingPage: React.FC = () => {
 
                 <div className="text-center space-y-1 mt-1">
                   <h4 className="font-bold text-sm text-slate-900 leading-snug">
-                    Shri Avinash Kumar
+                    {t("gov_cs_name")}
                   </h4>
                   <p className="text-xs text-slate-500">
-                    Chief Secretary, Government of Jharkhand
+                    {t("gov_cs_role")}
                   </p>
                 </div>
               </div>
@@ -332,7 +331,7 @@ export const LandingPage: React.FC = () => {
                   className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
                 >
                   <User className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Profile</span>
+                  <span>{t("gov_profile_btn")}</span>
                 </a>
                 <a
                   href="https://jharkhand.gov.in/Home/WebDirectory"
@@ -341,7 +340,7 @@ export const LandingPage: React.FC = () => {
                   className="flex-1 py-2 px-2 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center justify-center space-x-1 transition shadow-2xs"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Secretariat</span>
+                  <span>{t("gov_secretariat_btn")}</span>
                 </a>
               </div>
             </div>

@@ -323,6 +323,100 @@ export const parseThemeFromInput = (input: string): ProblemCategory | undefined 
   return matchedTheme ? matchedTheme.key : undefined;
 };
 
+export const cleanFormattingSymbols = (str: string): string => {
+  return str
+    .replace(/_{1,2}(.*?)_{1,2}/g, "$1")
+    .replace(/\*{1,2}(.*?)\*{1,2}/g, "$1")
+    .replace(/[_*]/g, "")
+    .trim();
+};
+
+export const renderFormattedWhatsAppText = (rawText: string) => {
+  const text = (rawText || "").trim();
+  const paragraphs = text.split(/\n{2,}/);
+
+  return (
+    <div className="space-y-2 text-xs leading-relaxed">
+      {paragraphs.map((para, pIdx) => {
+        const lines = para.split("\n");
+        return (
+          <div key={pIdx} className="space-y-1">
+            {lines.map((rawLine, lIdx) => {
+              const line = rawLine.trim();
+              if (!line) return null;
+
+              // 1. Voice transcription quote (e.g. "..." or _"..."_)
+              const isQuote =
+                (line.startsWith('"') && line.endsWith('"')) ||
+                (line.startsWith('_"') && line.endsWith('"_')) ||
+                (line.startsWith('“') && line.endsWith('”'));
+
+              if (isQuote) {
+                const quoteContent = line.replace(/^[_"“”]+|[_"“”]+$/g, "").trim();
+                return (
+                  <div
+                    key={lIdx}
+                    className="bg-emerald-50/90 border-l-3 border-emerald-600 rounded-r-lg px-3 py-1.5 my-1.5 shadow-2xs"
+                  >
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-800 block mb-0.5">
+                      Transcribed Voice
+                    </span>
+                    <p className="text-slate-800 font-semibold italic text-[12px]">
+                      "{quoteContent}"
+                    </p>
+                  </div>
+                );
+              }
+
+              // 2. Subtitle / Translation note in parentheses (e.g. (If incorrect...))
+              const isSubnote =
+                (line.startsWith("(") && line.endsWith(")")) ||
+                (line.startsWith("_(") && line.endsWith(")_"));
+
+              if (isSubnote) {
+                const cleanSub = line.replace(/^[_()]+|[()_]+$/g, "").trim();
+                return (
+                  <p key={lIdx} className="text-[11px] text-slate-500 font-normal italic pl-0.5 leading-tight">
+                    ({cleanSub})
+                  </p>
+                );
+              }
+
+              // 3. Bullet points (e.g. • Ticket ID: ...)
+              if (line.startsWith("•") || line.startsWith("-")) {
+                const cleanBullet = line.replace(/^[•\-*]\s*/, "");
+                return (
+                  <div key={lIdx} className="flex items-start space-x-1.5 pl-1 py-0.5 text-slate-700 text-[11.5px]">
+                    <span className="text-emerald-600 font-bold shrink-0">•</span>
+                    <span>{cleanFormattingSymbols(cleanBullet)}</span>
+                  </div>
+                );
+              }
+
+              // 4. Section headings with emojis
+              const hasEmojiHeader = /^([🎙️✅📍🏛️📝🎉⚠️ℹ️🔄📊🌾🏹🇮🇳])/.test(line);
+              if (hasEmojiHeader) {
+                return (
+                  <p key={lIdx} className="font-bold text-slate-900 text-[12.5px] pt-0.5">
+                    {cleanFormattingSymbols(line)}
+                  </p>
+                );
+              }
+
+              // 5. Normal line
+              return (
+                <p key={lIdx} className="text-slate-800 text-[12px]">
+                  {cleanFormattingSymbols(line)}
+                </p>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export const WhatsAppSimulatorModal: React.FC = () => {
   const {
     whatsappSimulatorOpen,
@@ -868,12 +962,12 @@ export const WhatsAppSimulatorModal: React.FC = () => {
 
       addBotMessage(
         activeLang === "santali"
-          ? `✅ *ᱛᱷᱤᱢ ᱵᱟᱪᱷᱟᱣ ᱮᱱᱟ (Theme Selected):*\n*${themeLabel}*\n\n📍 *ᱱᱚᱶᱟ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱨᱮᱭᱟᱜ ᱚᱠᱟ District (ᱡᱤᱞᱟᱹ) ᱨᱮ ᱢᱮᱱᱟᱜᱼᱟ? ᱡᱤᱞᱟᱹ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ:*\n_(Which District in Jharkhand is this problem located in? Choose or type below:)*`
+          ? `✅ ᱛᱷᱤᱢ ᱵᱟᱪᱷᱟᱣ ᱮᱱᱟ (Theme Selected):\n${themeLabel}\n\n📍 ᱱᱚᱶᱟ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱨᱮᱭᱟᱜ ᱚᱠᱟ District (ᱡᱤᱞᱟᱹ) ᱨᱮ ᱢᱮᱱᱟᱜᱼᱟ? ᱡᱤᱞᱟᱹ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`
           : activeLang === "nagpuri"
-          ? `✅ *थीम चुनल गेल (Theme Selected):*\n*${themeLabel}*\n\n📍 *ई समस्या झारखंड के कौन District (ज़िला) में बा? अपन ज़िला चुनू या लिखू:*\n_(Which District in Jharkhand is this problem located in? Choose or type below:)*`
+          ? `✅ थीम चुनल गेल (Theme Selected):\n${themeLabel}\n\n📍 ई समस्या झारखंड के कौन District (ज़िला) में बा? अपन ज़िला चुनू या लिखू:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`
           : activeLang === "hi"
-          ? `✅ *थीम चुनी गई (Theme Selected):*\n*${themeLabel}*\n\n📍 *यह समस्या झारखंड के किस District (ज़िले) में है? अपना ज़िला चुनें या लिखें:*\n_(Which District in Jharkhand is this problem located in? Choose or type below:)*`
-          : `✅ *Theme Selected:* *${themeLabel}*\n\n📍 *Which District in Jharkhand is this problem located in? Please choose or type:*`,
+          ? `✅ थीम चुनी गई (Theme Selected):\n${themeLabel}\n\n📍 यह समस्या झारखंड के किस District (ज़िले) में है? अपना ज़िला चुनें या लिखें:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`
+          : `✅ Theme Selected:\n${themeLabel}\n\n📍 Which District in Jharkhand is this problem located in? Please choose or type:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`,
         getDistrictOptions(activeLang)
       );
       return;
@@ -1102,12 +1196,12 @@ export const WhatsAppSimulatorModal: React.FC = () => {
 
       addBotMessage(
         activeLang === "santali"
-          ? `✅ *AI ᱦᱚᱛᱮᱛᱮ ᱛᱷᱤᱢ (AI Detected Theme):*\n*${themeLabel}*\n_(ᱡᱩᱫᱤ ᱵᱟᱝ ᱴᱷᱤᱠᱟ, '🔄 ᱛᱷᱤᱢ ᱵᱚᱫᱚᱞ' ᱚᱛᱟᱭ ᱢᱮ / If incorrect, tap 'Change Theme')_\n\n📍 *ᱱᱚᱶᱟ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱨᱮᱭᱟᱜ ᱚᱠᱟ District (ᱡᱤᱞᱟᱹ) ᱨᱮ ᱢᱮᱱᱟᱜᱼᱟ? ᱡᱤᱞᱟᱹ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ:*\n_(Which District in Jharkhand is this problem located in? Choose or type below:)*`
+          ? `✅ AI ᱦᱚᱛᱮᱛᱮ ᱛᱷᱤᱢ (AI Detected Theme):\n${themeLabel}\n(ᱡᱩᱫᱤ ᱵᱟᱝ ᱴᱷᱤᱠᱟ, '🔄 ᱛᱷᱤᱢ ᱵᱚᱫᱚᱞ' ᱚᱛᱟᱭ ᱢᱮ / If incorrect, tap 'Change Theme')\n\n📍 ᱱᱚᱶᱟ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱨᱮᱭᱟᱜ ᱚᱠᱟ District (ᱡᱤᱞᱟᱹ) ᱨᱮ ᱢᱮᱱᱟᱜᱼᱟ? ᱡᱤᱞᱟᱹ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`
           : activeLang === "nagpuri"
-          ? `✅ *AI द्वारा पहचानल गेल थीम (AI Detected Theme):*\n*${themeLabel}*\n_(यदि ई सही नइखे, तो '🔄 थीम बदलू' चुनू / If incorrect, tap 'Change Theme')_\n\n📍 *ई समस्या झारखंड के कौन District (ज़िला) में बा? अपन ज़िला चुनू या लिखू:*\n_(Which District in Jharkhand is this problem located in? Choose or type below:)*`
+          ? `✅ AI द्वारा पहचानल थीम (AI Detected Theme):\n${themeLabel}\n(यदि ई सही नइखे, तो '🔄 थीम बदलू' चुनू / If incorrect, tap 'Change Theme')\n\n📍 ई समस्या झारखंड के कौन District (ज़िला) में बा? अपन ज़िला चुनू या लिखू:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`
           : activeLang === "hi"
-          ? `✅ *AI द्वारा पहचानी गई थीम (AI Detected Theme):*\n*${themeLabel}*\n_(यदि यह सही नहीं है, तो '🔄 थीम बदलें' चुनें / If incorrect, tap 'Change Theme')_\n\n📍 *यह समस्या झारखंड के किस District (ज़िले) में है? अपना ज़िला चुनें या लिखें:*\n_(Which District in Jharkhand is this problem located in? Choose or type below:)*`
-          : `✅ *AI Detected Theme:* *${themeLabel}*\n_(If this is incorrect, tap '🔄 Change Theme')_\n\n📍 *Which District in Jharkhand is this problem located in? Please choose or type:*`,
+          ? `✅ AI द्वारा पहचानी गई थीम (AI Detected Theme):\n${themeLabel}\n(यदि यह सही नहीं है, तो '🔄 थीम बदलें' चुनें / If incorrect, tap 'Change Theme')\n\n📍 यह समस्या झारखंड के किस District (ज़िले) में है? अपना ज़िला चुनें या लिखें:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`
+          : `✅ AI Detected Theme:\n${themeLabel}\n(If this is incorrect, tap '🔄 Change Theme')\n\n📍 Which District in Jharkhand is this problem located in? Please choose or type:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`,
         getDistrictOptions(activeLang)
       );
     }
@@ -1361,12 +1455,12 @@ export const WhatsAppSimulatorModal: React.FC = () => {
 
     const decodedBotText =
       activeLang === "santali"
-        ? `🎙️ *Voice Note Transcribed (AI Speech-to-Text • ᱥᱟᱱᱛᱟᱲᱤ / Santhali):*\n_"${spoken}"_\n\n✅ *AI ᱦᱚᱛᱮᱛᱮ ᱛᱷᱤᱢ (AI Detected Theme):*\n*${themeLabel}*\n_(ᱡᱩᱫᱤ ᱵᱟᱝ ᱴᱷᱤᱠᱟ, '🔄 ᱛᱷᱤᱢ ᱵᱚᱫᱚᱞ' ᱚᱛᱟᱭ ᱢᱮ / If incorrect, tap 'Change Theme')_\n\n📍 *ᱱᱚᱶᱟ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱨᱮᱭᱟᱜ ᱚᱠᱟ District (ᱡᱤᱞᱟᱹ) ᱨᱮ ᱢᱮᱱᱟᱜᱼᱟ? ᱡᱤᱞᱟᱹ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ:*\n_(Which District in Jharkhand is this problem located in? Choose or type below:)*`
+        ? `🎙️ Voice Note Transcribed (AI Speech-to-Text • ᱥᱟᱱᱛᱟᱲᱤ / Santhali):\n"${spoken}"\n\n✅ AI ᱦᱚᱛᱮᱛᱮ ᱛᱷᱤᱢ (AI Detected Theme):\n${themeLabel}\n(ᱡᱩᱫᱤ ᱵᱟᱝ ᱴᱷᱤᱠᱟ, '🔄 ᱛᱷᱤᱢ ᱵᱚᱫᱚᱞ' ᱚᱛᱟᱭ ᱢᱮ / If incorrect, tap 'Change Theme')\n\n📍 ᱱᱚᱶᱟ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱨᱮᱭᱟᱜ ᱚᱠᱟ District (ᱡᱤᱞᱟᱹ) ᱨᱮ ᱢᱮᱱᱟᱜᱼᱟ? ᱡᱤᱞᱟᱹ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`
         : activeLang === "nagpuri"
-        ? `🎙️ *वॉइस नोट डिकोड भेल (AI Speech-to-Text • नागपुरी / Nagpuri):*\n_"${spoken}"_\n\n✅ *AI द्वारा पहचानल गेल थीम (AI Detected Theme):*\n*${themeLabel}*\n_(यदि ई सही नइखे, तो '🔄 थीम बदलू' चुनू / If incorrect, tap 'Change Theme')_\n\n📍 *ई समस्या झारखंड के कौन District (ज़िला) में बा? अपन ज़िला चुनू या लिखू:*\n_(Which District in Jharkhand is this problem located in? Choose or type below:)*`
+        ? `🎙️ वॉइस नोट डिकोड भेल (AI Speech-to-Text • नागपुरी / Nagpuri):\n"${spoken}"\n\n✅ AI द्वारा पहचानल थीम (AI Detected Theme):\n${themeLabel}\n(यदि ई सही नइखे, तो '🔄 थीम बदलू' चुनू / If incorrect, tap 'Change Theme')\n\n📍 ई समस्या झारखंड के कौन District (ज़िला) में बा? अपन ज़िला चुनू या लिखू:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`
         : activeLang === "hi"
-        ? `🎙️ *वॉइस नोट डिकोड हुआ (AI Speech-to-Text • हिन्दी / Hindi):*\n_"${spoken}"_\n\n✅ *AI द्वारा पहचानी गई थीम (AI Detected Theme):*\n*${themeLabel}*\n_(यदि यह सही नहीं है, तो '🔄 थीम बदलें' चुनें / If incorrect, tap 'Change Theme')_\n\n📍 *यह समस्या झारखंड के किस District (ज़िले) में है? अपना ज़िला चुनें या लिखें:*\n_(Which District in Jharkhand is this problem located in? Choose or type below:)*`
-        : `🎙️ *Voice Note Transcribed (AI Speech-to-Text • English):*\n_"${spoken}"_\n\n✅ *AI Detected Theme:* *${themeLabel}*\n_(If this is incorrect, tap '🔄 Change Theme')_\n\n📍 *Which District in Jharkhand is this problem located in? Please choose or type:*`;
+        ? `🎙️ वॉइस नोट डिकोड हुआ (AI Speech-to-Text • हिन्दी / Hindi):\n"${spoken}"\n\n✅ AI द्वारा पहचानी गई थीम (AI Detected Theme):\n${themeLabel}\n(यदि यह सही नहीं है, तो '🔄 थीम बदलें' चुनें / If incorrect, tap 'Change Theme')\n\n📍 यह समस्या झारखंड के किस District (ज़िले) में है? अपना ज़िला चुनें या लिखें:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`
+        : `🎙️ Voice Note Transcribed (AI Speech-to-Text • English):\n"${spoken}"\n\n✅ AI Detected Theme:\n${themeLabel}\n(If this is incorrect, tap '🔄 Change Theme')\n\n📍 Which District in Jharkhand is this problem located in? Please choose or type:\n(Which District in Jharkhand is this problem located in? Choose or type below:)`;
 
     addBotMessage(
       decodedBotText,
@@ -1644,8 +1738,8 @@ export const WhatsAppSimulatorModal: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="whitespace-pre-wrap leading-relaxed">
-                    {m.text}
+                  <div>
+                    {renderFormattedWhatsAppText(m.text)}
                   </div>
                 )}
 

@@ -55,15 +55,155 @@ interface ChatMessage {
   };
 }
 
-const ALL_THEMES: { key: ProblemCategory; labelHi: string; labelEn: string; icon: string }[] = [
-  { key: "Water Resources & Sanitation", labelHi: "जल संसाधन एवं स्वच्छता", labelEn: "Water Resources & Sanitation", icon: "💧" },
-  { key: "Agriculture & Allied Technologies", labelHi: "कृषि एवं संबद्ध तकनीक", labelEn: "Agriculture & Allied Technologies", icon: "🌾" },
-  { key: "Healthcare & MedTech", labelHi: "स्वास्थ्य सेवा एवं मेडटेक", labelEn: "Healthcare & MedTech", icon: "🏥" },
-  { key: "Rural Infrastructure & Transport", labelHi: "ग्रामीण बुनियादी ढांचा एवं सड़क", labelEn: "Rural Infrastructure & Transport", icon: "🛣️" },
-  { key: "Education & Smart Learning", labelHi: "शिक्षा एवं स्मार्ट लर्निंग", labelEn: "Education & Smart Learning", icon: "📚" },
-  { key: "Environment & Mining Remediation", labelHi: "पर्यावरण एवं खनन उपचार", labelEn: "Environment & Mining Remediation", icon: "🌲" },
-  { key: "Renewable Energy & Off-Grid Power", labelHi: "नवीकरणीय ऊर्जा एवं बिजली", labelEn: "Renewable Energy & Off-Grid Power", icon: "⚡" },
-  { key: "Forest & Tribal Livelihoods", labelHi: "वन एवं जनजातीय आजीविका", labelEn: "Forest & Tribal Livelihoods", icon: "🏹" }
+export type ChatLang = "en" | "hi" | "nagpuri" | "santali";
+
+export const LANG_CONFIG: Record<
+  ChatLang,
+  {
+    name: string;
+    nativeName: string;
+    flag: string;
+    badge: string;
+    voiceLocale: string;
+    placeholder: string;
+    typingNotice: string;
+    botTitle: string;
+    starterHint: string;
+    optReport: string;
+    optCheck: string;
+    optHelp: string;
+  }
+> = {
+  en: {
+    name: "English",
+    nativeName: "English",
+    flag: "🌐",
+    badge: "EN",
+    voiceLocale: "en-IN",
+    placeholder: "Type problem in English, Hindi, Nagpuri, Santhali...",
+    typingNotice: "Jharkhand Sahayak is typing...",
+    botTitle: "Jharkhand Sahayak AI Grievance Bot",
+    starterHint: "Select an option or type your problem / send a voice note in your preferred language (English, Hindi, Nagpuri, Santhali / ᱥᱟᱱᱛᱟᱲᱤ):",
+    optReport: "Report New Problem",
+    optCheck: "Check Complaint Progress",
+    optHelp: "Help & Information"
+  },
+  hi: {
+    name: "Hindi",
+    nativeName: "हिन्दी",
+    flag: "🇮🇳",
+    badge: "HI",
+    voiceLocale: "hi-IN",
+    placeholder: "अपनी समस्या हिंदी, नागपुरी, संथाली या English में लिखें...",
+    typingNotice: "झारखंड सहायक टाइप कर रहा है...",
+    botTitle: "झारखंड सहायक 24/7 AI चैट",
+    starterHint: "बातचीत शुरू करने के लिए कोई विकल्प चुनें या नीचे सीधे अपनी भाषा (हिंदी, नागपुरी, संथाली, English) में मैसेज या वॉइस नोट भेजें:",
+    optReport: "नई समस्या दर्ज करें",
+    optCheck: "कंप्लेंट प्रोग्रेस देखें",
+    optHelp: "मदद एवं जानकारी"
+  },
+  nagpuri: {
+    name: "Nagpuri",
+    nativeName: "नागपुरी",
+    flag: "🌾",
+    badge: "NGP",
+    voiceLocale: "hi-IN",
+    placeholder: "अपन समस्या नागपुरी, हिंदी, संथाली या English में लिखू...",
+    typingNotice: "झारखंड सहायक लिखत आहे...",
+    botTitle: "झारखंड सहायक AI गोहार चैट (नागपुरी)",
+    starterHint: "बातचीत सुरू करेक ले कोनो विकल्प चुनू या सीधा अपन भाषा (नागपुरी, हिंदी, संथाली, English) में लिखू या बोलू:",
+    optReport: "नया समस्या / गोहार दर्ज करूं",
+    optCheck: "शिकायत के स्थिति देखू",
+    optHelp: "मदद एवं जानकारी"
+  },
+  santali: {
+    name: "Santhali",
+    nativeName: "ᱥᱟᱱᱛᱟᱲᱤ",
+    flag: "🏹",
+    badge: "SAT",
+    voiceLocale: "hi-IN",
+    placeholder: "ᱟᱢᱟᱜ ᱮᱴᱠᱮᱴᱚᱬᱮ Santhali, Nagpuri, Hindi, English ᱛᱮ ᱚᱞ ᱢᱮ...",
+    typingNotice: "ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱥᱚᱦᱟᱭᱚᱠ ᱚᱞ ᱮᱫᱟᱭ...",
+    botTitle: "ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱥᱚᱦᱟᱭᱚᱠ AI ᱮᱴᱠᱮᱴᱚᱬᱮ ᱵᱚᱴ",
+    starterHint: "ᱨᱚᱯᱚᱲ ᱮᱛᱚᱦᱚᱵ ᱞᱟᱹᱜᱤᱫ ᱚᱞ ᱢᱮ ᱥᱮ ᱟᱲᱟᱝ (Voice note) ᱠᱩᱞ ᱢᱮ (ᱥᱟᱱᱛᱟᱲᱤ, Nagpuri, Hindi, English):",
+    optReport: "ᱱᱟᱣᱟ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱚᱞ ᱢᱮ (Report Problem)",
+    optCheck: "ᱮᱴᱠᱮᱴᱚᱬᱮ ᱨᱮᱭᱟᱜ ᱦᱟᱞᱚᱛ ᱧᱮᱞ (Check Status)",
+    optHelp: "ᱜᱚᱲᱚ ᱟᱨ ᱵᱟᱰᱟᱭ (Help & Info)"
+  }
+};
+
+const ALL_THEMES: {
+  key: ProblemCategory;
+  labelHi: string;
+  labelEn: string;
+  labelNag: string;
+  labelSat: string;
+  icon: string;
+}[] = [
+  {
+    key: "Water Resources & Sanitation",
+    labelHi: "जल संसाधन एवं स्वच्छता",
+    labelEn: "Water Resources & Sanitation",
+    labelNag: "पानी संसाधन एवं चापाकल",
+    labelSat: "ᱫᱟᱜ ᱟᱨ ᱥᱟᱯᱷᱟ-ᱥᱟᱯᱷᱤ (Water & Sanitation)",
+    icon: "💧"
+  },
+  {
+    key: "Agriculture & Allied Technologies",
+    labelHi: "कृषि एवं संबद्ध तकनीक",
+    labelEn: "Agriculture & Allied Technologies",
+    labelNag: "खेती-बाड़ी, सुखाड़ एवं फसल",
+    labelSat: "ᱪᱟᱥ-ᱵᱟᱥ ᱟᱨ ᱦᱟᱥᱟ (Agriculture)",
+    icon: "🌾"
+  },
+  {
+    key: "Healthcare & MedTech",
+    labelHi: "स्वास्थ्य सेवा एवं मेडटेक",
+    labelEn: "Healthcare & MedTech",
+    labelNag: "स्वास्थ्य सेवा, अस्पताल एवं दवाई",
+    labelSat: "ᱨᱩᱣᱟᱹ-ᱦᱟᱥᱯᱟᱛᱟᱞ ᱟᱨ ᱨᱟᱱ (Healthcare)",
+    icon: "🏥"
+  },
+  {
+    key: "Rural Infrastructure & Transport",
+    labelHi: "ग्रामीण बुनियादी ढांचा एवं सड़क",
+    labelEn: "Rural Infrastructure & Transport",
+    labelNag: "गाँव के सड़क, पुलिया एवं डहर",
+    labelSat: "ᱟᱹᱛᱩ ᱦᱚᱨ ᱟᱨ ᱯᱩᱞ (Rural Roads)",
+    icon: "🛣️"
+  },
+  {
+    key: "Education & Smart Learning",
+    labelHi: "शिक्षा एवं स्मार्ट लर्निंग",
+    labelEn: "Education & Smart Learning",
+    labelNag: "शिक्षा, स्कूल एवं पढ़ाई",
+    labelSat: "ᱚᱞ ᱤᱛᱩᱱ ᱟᱨ ᱤᱥᱠᱩᱞ (Education)",
+    icon: "📚"
+  },
+  {
+    key: "Environment & Mining Remediation",
+    labelHi: "पर्यावरण एवं खनन उपचार",
+    labelEn: "Environment & Mining Remediation",
+    labelNag: "पर्यावरण, प्रदूषण एवं कोयला खदान",
+    labelSat: "ᱯᱚᱨᱤᱵᱮᱥ ᱟᱨ ᱠᱷᱟᱫᱟᱱ (Mining & Ecology)",
+    icon: "🌲"
+  },
+  {
+    key: "Renewable Energy & Off-Grid Power",
+    labelHi: "नवीकरणीय ऊर्जा एवं बिजली",
+    labelEn: "Renewable Energy & Off-Grid Power",
+    labelNag: "बिजुली, सोलर एवं लाइट",
+    labelSat: "ᱵᱟᱹᱛᱤ ᱟᱨ ᱥᱚᱞᱟᱨ ᱵᱤᱡᱩᱞᱤ (Solar & Power)",
+    icon: "⚡"
+  },
+  {
+    key: "Forest & Tribal Livelihoods",
+    labelHi: "वन एवं जनजातीय आजीविका",
+    labelEn: "Forest & Tribal Livelihoods",
+    labelNag: "जंगल, महुआ, लाह एवं आदिवासी रोजगार",
+    labelSat: "ᱵᱤᱨ ᱟᱨ ᱦᱚᱲ ᱦᱚᱯᱚᱱ ᱟᱹᱥᱩᱞ (Tribal Livelihoods)",
+    icon: "🏹"
+  }
 ];
 
 export const WhatsAppSimulatorModal: React.FC = () => {
@@ -89,8 +229,16 @@ export const WhatsAppSimulatorModal: React.FC = () => {
   const recordingTimerRef = useRef<any>(null);
   const [lastSubmittedProblem, setLastSubmittedProblem] = useState<Problem | null>(null);
 
-  // Dynamic language detection: adapts to whether user writes in Hindi/Hinglish or English
-  const [chatLang, setChatLang] = useState<"hi" | "en">(currentLanguage === "hi" ? "hi" : "en");
+  // Dynamic language detection: supports en, hi, nagpuri, and santali
+  const [chatLang, setChatLang] = useState<ChatLang>(
+    currentLanguage === "santali"
+      ? "santali"
+      : currentLanguage === "nagpuri"
+      ? "nagpuri"
+      : currentLanguage === "hi"
+      ? "hi"
+      : "en"
+  );
 
   // Conversational workflow state machine
   const [conversationStep, setConversationStep] = useState<
@@ -116,25 +264,61 @@ export const WhatsAppSimulatorModal: React.FC = () => {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const detectUserLanguage = (text: string): "hi" | "en" => {
+  const detectUserLanguage = (text: string): ChatLang => {
+    // 1. Ol Chiki script or Santali keywords (both Ol Chiki and Roman)
+    if (/[\u1C50-\u1C7F]/.test(text)) return "santali";
+    const santaliWords = [
+      "johar", "daah", "dạh", "etketone", "etketõṇe", "aatu", "hor", "rua", "haspatal",
+      "bati", "ischool", "chas", "khasa", "bir", "menak", "menak'a", "bano", "bano'a",
+      "cheleka", "chet", "aleyag", "amag", "inye", "inya", "sanam", "apeya", "ran", "baadi",
+      "santhali", "santali", "hor hopon", "matkom", "sarjom", "dare"
+    ];
+    const low = text.toLowerCase();
+    const words = low.split(/[^a-zA-Z0-9\u0900-\u097F\u1C50-\u1C7F]+/);
+    if (words.some((w) => santaliWords.includes(w))) return "santali";
+
+    // Santali in Devanagari
+    const santaliDevanagari = ["दाः", "आतु", "होर", "रुअ", "बाड़ी", "संथाली", "संताली", "चास", "बीर"];
+    if (santaliDevanagari.some((w) => text.includes(w))) return "santali";
+
+    // 2. Nagpuri / Sadri distinctive words
+    const nagpuriWords = [
+      "kahe", "kaheke", "kesan", "tohar", "hamar", "raura", "mor", "tohar", "chapakal",
+      "naikhe", "naikhen", "naakhe", "aahe", "baate", "have", "howat", "gel", "gelak",
+      "aawat", "aawela", "bane", "gohar", "beemar", "sukh gel", "toot gel", "bijuli",
+      "andharia", "puchhat", "batawa", "nagpuri"
+    ];
+    if (words.some((w) => nagpuriWords.includes(w))) return "nagpuri";
+
+    // Nagpuri in Devanagari
+    const nagpuriDevanagari = [
+      "नइखे", "नईखे", "नाइखे", "नाखे", "आहे", "हवे", "होवत", "गेल", "गेलक", "बाटे",
+      "तोहार", "हमार", "रउरा", "मोर", "तोहर", "चापाकल", "सुखल", "सुख गेल", "टूट गेल",
+      "गोहार", "केसन", "काहे", "नइखन", "नागपुरी", "बिजुली", "अंधरिया"
+    ];
+    if (nagpuriDevanagari.some((w) => text.includes(w))) return "nagpuri";
+
+    // 3. Devanagari Hindi
     if (/[\u0900-\u097F]/.test(text)) return "hi";
+
+    // 4. Hinglish
     const hinglishWords = [
       "kya", "kaise", "mera", "meri", "mere", "humara", "hamara", "humare", "hamare",
       "yahan", "yaha", "pani", "paani", "bijli", "sadak", "bimar", "bimari", "samasya",
       "dikkat", "nahi", "nhi", "hai", "hain", "batao", "karo", "kijiye", "dekho",
-      "chahiye", "shuru", "madad", "namaste", "johar", "pranam", "ha", "haan", "theek",
+      "chahiye", "shuru", "madad", "namaste", "pranam", "ha", "haan", "theek",
       "thik", "bhai", "yaar", "gaav", "gaon", "chhat", "khula", "kharab", "toota",
       "stithi", "kripya", "nayi", "darj", "dekhein", "karein", "kaunsi", "acha", "achha"
     ];
-    const low = text.toLowerCase();
-    const words = low.split(/[^a-zA-Z0-9\u0900-\u097F]+/);
     if (words.some((w) => hinglishWords.includes(w))) return "hi";
+
     const engWords = [
       "water", "road", "electricity", "help", "status", "track", "progress",
       "broken", "issue", "school", "hospital", "doctor", "light", "village",
       "block", "district", "hello", "problem", "check", "report"
     ];
     if (words.some((w) => engWords.includes(w))) return "en";
+
     return chatLang;
   };
 
@@ -216,7 +400,7 @@ export const WhatsAppSimulatorModal: React.FC = () => {
     }, 600);
   };
 
-  const showProgressForProblem = (p: Problem, lang: "hi" | "en") => {
+  const showProgressForProblem = (p: Problem, lang: ChatLang) => {
     const univObj = universities.find((u) => u.id === p.assignedUniversityId);
     const assignedUniv =
       p.aiExplanation?.suggestedUniversities?.[0]?.universityName ||
@@ -230,13 +414,21 @@ export const WhatsAppSimulatorModal: React.FC = () => {
     const badge = getStatusBadge(p.status);
 
     const reportHeader =
-      lang === "hi"
+      lang === "santali"
+        ? `📊 *ᱮᱴᱠᱮᱴᱚᱬᱮ ᱦᱟᱞᱚᱛ ᱨᱤᱯᱚᱨᱴ (Status Report)*\n\n• *Ticket ID:* #${p.ticketNumber}\n• *ᱦᱟᱞᱚᱛ:* ${badge.icon} *${badge.label}*\n• *ᱛᱷᱤᱢ:* ${p.category}\n• *ᱴᱷᱟᱶ:* ᱡᱤᱞᱟᱹ ${p.district}${p.block ? ` (${p.block})` : ""}\n• *Institute:* ${assignedUniv}\n\nᱞᱟᱛᱟᱨ ᱨᱮ ᱯᱨᱚᱜᱨᱮᱥ ᱧᱮᱞ ᱢᱮ:`
+        : lang === "nagpuri"
+        ? `📊 *शिकायत के लाइव स्थिति रिपोर्ट*\n\n• *टिकट संख्या:* #${p.ticketNumber}\n• *वर्तमान स्थिति:* ${badge.icon} *${badge.labelHi}*\n• *श्रेणी (Theme):* ${p.category}\n• *स्थान:* ज़िला ${p.district}${p.block ? ` (${p.block})` : ""}\n• *आवंटित संस्थान:* ${assignedUniv}\n\nनीचे लाइव प्रोग्रेस टाइमलाइन देखू:`
+        : lang === "hi"
         ? `📊 *शिकायत निवारण लाइव स्थिति रिपोर्ट*\n\n• *टिकट संख्या:* #${p.ticketNumber}\n• *वर्तमान स्थिति:* ${badge.icon} *${badge.labelHi}*\n• *श्रेणी (Theme):* ${p.category}\n• *स्थान:* ज़िला ${p.district}${p.block ? ` (${p.block})` : ""}\n• *आवंटित संस्थान:* ${assignedUniv}\n\nनीचे लाइव प्रोग्रेस टाइमलाइन देखें:`
         : `📊 *Grievance Live Status Report*\n\n• *Ticket ID:* #${p.ticketNumber}\n• *Current Stage:* ${badge.icon} *${badge.label}*\n• *Category:* ${p.category}\n• *Location:* ${p.district}${p.block ? ` (${p.block})` : ""}\n• *Allocated Institute:* ${assignedUniv}\n\nLive milestone timeline is shown below:`;
 
     addBotMessage(
       reportHeader,
-      lang === "hi"
+      lang === "santali"
+        ? ["🔄 ᱦᱟᱞᱚᱛ ᱨᱤᱯᱷᱨᱮᱥ (Refresh)", "📝 ᱱᱟᱣᱟ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱚᱞ", "🏠 ᱢᱩᱬᱩᱛ ᱢᱮᱱᱩ (Menu)"]
+        : lang === "nagpuri"
+        ? ["🔄 रिफ्रेश स्थिति", "📝 नया समस्या दर्ज करूं", "🏠 मुख्य मेनू"]
+        : lang === "hi"
         ? ["🔄 रिफ्रेश स्थिति", "📝 नई समस्या दर्ज करें", "🏠 मुख्य मेनू"]
         : ["🔄 Refresh Status", "📝 Report New Problem", "🏠 Main Menu"],
       false,
@@ -826,9 +1018,13 @@ export const WhatsAppSimulatorModal: React.FC = () => {
     // Fallback if browser SpeechRecognition was not supported or returned empty
     if (!spoken) {
       const manual = window.prompt(
-        chatLang === "hi"
-          ? "माइक से आवाज नहीं मिली (या परमिशन नहीं मिली)। आपने जो बोला वो यहाँ लिखें:"
-          : "Microphone speech was not captured. Please enter what you spoke:",
+        chatLang === "santali"
+          ? "ᱢᱟᱭᱤᱠ ᱛᱮ ᱟᱲᱟᱝ ᱵᱟᱝ ᱥᱮᱴᱮᱨ ᱞᱮᱱᱟ ᱾ ᱟᱢᱟᱜ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱱᱚᱸᱰᱮ ᱚᱞ ᱢᱮ (Santhali, Nagpuri, Hindi, English):"
+          : chatLang === "nagpuri"
+          ? "माइक से आवाज नई मिलल। रउरा जे बोलली वोहे इहाँ लिखू (नागपुरी, हिंदी, English):"
+          : chatLang === "hi"
+          ? "माइक से आवाज नहीं मिली (या परमिशन नहीं मिली)। आपने जो बोला वो यहाँ लिखें (हिंदी, नागपुरी, संथाली, English):"
+          : "Microphone speech was not captured. Please enter what you spoke (English, Hindi, Nagpuri, Santhali):",
         ""
       );
       if (manual && manual.trim()) {
@@ -870,7 +1066,7 @@ export const WhatsAppSimulatorModal: React.FC = () => {
     const validation = await aiEngine.validateProblem({
       title: "Voice Grievance",
       description: fullProblemText,
-      language: activeLang
+      language: activeLang === "santali" ? "sat" : activeLang === "nagpuri" ? "nag" : activeLang === "hi" ? "hi" : "en"
     });
 
     setIsTyping(false);
@@ -883,10 +1079,24 @@ export const WhatsAppSimulatorModal: React.FC = () => {
       setConversationStep("SELECT_THEME");
 
       addBotMessage(
-        activeLang === "hi"
-          ? `🎙️ *वॉइस नोट डिकोड हुआ (Speech-to-Text):*\n_"${spoken}"_\n\n⚠️ *AI थीम पहचान अनिश्चित (Theme Detection Uncertain)*\nAI आपकी बोली गई समस्या की सटीक थीम स्वतः तय नहीं कर सका।\n\nकृपया नीचे दिए गए विकल्पों में से सही थीम चुनें:`
-          : `🎙️ *Voice Note Transcribed (Speech-to-Text):*\n_"${spoken}"_\n\n⚠️ *AI Theme Detection Uncertain*\nAI could not automatically determine the exact theme for what was spoken.\n\nPlease select the appropriate Theme from the options below:`,
-        ALL_THEMES.map((t) => `${t.icon} ${activeLang === "hi" ? t.labelHi : t.labelEn}`)
+        activeLang === "santali"
+          ? `🎙️ *Voice Note Transcribed (Speech-to-Text • ᱥᱟᱱᱛᱟᱲᱤ):*\n_"${spoken}"_\n\n⚠️ *AI ᱛᱷᱤᱢ ᱵᱟᱝ ᱴᱷᱟᱹᱣᱠᱟᱹ ᱞᱮᱱᱟ (Theme Detection Uncertain)*\nᱫᱟᱭᱟᱠᱟᱛᱮ ᱞᱟᱛᱟᱨ ᱠᱷᱚᱱ ᱴᱷᱤᱠ ᱛᱷᱤᱢ ᱵᱟᱪᱷᱟᱣ ᱢᱮ:`
+          : activeLang === "nagpuri"
+          ? `🎙️ *वॉइस नोट डिकोड भेल (Speech-to-Text • नागपुरी):*\n_"${spoken}"_\n\n⚠️ *AI थीम पहचान अनिश्चित (Theme Detection Uncertain)*\nAI रउरा बोली कर सटीक थीम स्वतः तय नइखे कर सकल।\n\nकृपया नीचे से सही थीम चुनू:`
+          : activeLang === "hi"
+          ? `🎙️ *वॉइस नोट डिकोड हुआ (Speech-to-Text • हिन्दी):*\n_"${spoken}"_\n\n⚠️ *AI थीम पहचान अनिश्चित (Theme Detection Uncertain)*\nAI आपकी बोली गई समस्या की सटीक थीम स्वतः तय नहीं कर सका।\n\nकृपया नीचे दिए गए विकल्पों में से सही थीम चुनें:`
+          : `🎙️ *Voice Note Transcribed (Speech-to-Text • English):*\n_"${spoken}"_\n\n⚠️ *AI Theme Detection Uncertain*\nAI could not automatically determine the exact theme for what was spoken.\n\nPlease select the appropriate Theme from the options below:`,
+        ALL_THEMES.map((t) => {
+          const lbl =
+            activeLang === "santali"
+              ? t.labelSat
+              : activeLang === "nagpuri"
+              ? t.labelNag
+              : activeLang === "hi"
+              ? t.labelHi
+              : t.labelEn;
+          return `${t.icon} ${lbl}`;
+        })
       );
       return;
     }
@@ -901,14 +1111,24 @@ export const WhatsAppSimulatorModal: React.FC = () => {
     setConversationStep("SELECT_DISTRICT");
 
     const decodedBotText =
-      activeLang === "hi"
-        ? `🎙️ *वॉइस नोट डिकोड हुआ (AI Speech-to-Text):*\n_"${spoken}"_\n\n✅ *AI द्वारा पहचानी गई थीम:* *${detectedTheme}*\n(यदि यह सही नहीं है, तो '🔄 थीम बदलें' चुनें)\n\n📍 यह समस्या झारखंड के किस *District (ज़िले)* में है? अपना ज़िला चुनें या लिखें:`
-        : `🎙️ *Voice Note Transcribed (AI Speech-to-Text):*\n_"${spoken}"_\n\n✅ *AI Detected Theme:* *${detectedTheme}*\n(If this is incorrect, tap '🔄 Change Theme')\n\n📍 Which *District* is this issue located in? Please select or type your district:`;
+      activeLang === "santali"
+        ? `🎙️ *Voice Note Transcribed (Speech-to-Text • ᱥᱟᱱᱛᱟᱲᱤ / Santhali):*\n_"${spoken}"_\n\n✅ *AI ᱦᱚᱛᱮᱛᱮ ᱛᱷᱤᱢ (Theme):* *${detectedTheme}*\n(ᱡᱩᱫᱤ ᱵᱟᱝ ᱴᱷᱤᱠᱟ, '🔄 ᱛᱷᱤᱢ ᱵᱚᱫᱚᱞ' ᱚᱛᱟᱭ ᱢᱮ)\n\n📍 ᱱᱚᱶᱟ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱨᱮᱭᱟᱜ ᱚᱠᱟ *District (ᱡᱤᱞᱟᱹ)* ᱨᱮ ᱢᱮᱱᱟᱜᱼᱟ? ᱡᱤᱞᱟᱹ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ:`
+        : activeLang === "nagpuri"
+        ? `🎙️ *वॉइस नोट डिकोड भेल (AI Speech-to-Text • नागपुरी):*\n_"${spoken}"_\n\n✅ *AI द्वारा पहचानल गेल थीम:* *${detectedTheme}*\n(यदि ई सही नइखे, तो '🔄 थीम बदलू' चुनू)\n\n📍 ई समस्या झारखंड के कौन *District (ज़िला)* में बा? अपन ज़िला चुनू या लिखू:`
+        : activeLang === "hi"
+        ? `🎙️ *वॉइस नोट डिकोड हुआ (AI Speech-to-Text • हिन्दी):*\n_"${spoken}"_\n\n✅ *AI द्वारा पहचानी गई थीम:* *${detectedTheme}*\n(यदि यह सही नहीं है, तो '🔄 थीम बदलें' चुनें)\n\n📍 यह समस्या झारखंड के किस *District (ज़िले)* में है? अपना ज़िला चुनें या लिखें:`
+        : `🎙️ *Voice Note Transcribed (AI Speech-to-Text • English):*\n_"${spoken}"_\n\n✅ *AI Detected Theme:* *${detectedTheme}*\n(If this is incorrect, tap '🔄 Change Theme')\n\n📍 Which *District* is this issue located in? Please select or type your district:`;
 
     addBotMessage(
       decodedBotText,
       [
-        activeLang === "hi" ? "🔄 थीम बदलें (Change Theme)" : "🔄 Change Theme",
+        activeLang === "santali"
+          ? "🔄 ᱛᱷᱤᱢ ᱵᱚᱫᱚᱞ (Change Theme)"
+          : activeLang === "nagpuri"
+          ? "🔄 थीम बदलू (Change Theme)"
+          : activeLang === "hi"
+          ? "🔄 थीम बदलें (Change Theme)"
+          : "🔄 Change Theme",
         "Ranchi", "Dhanbad", "Bokaro", "East Singhbhum", "Hazaribagh",
         "Deoghar", "Dumka", "Palamu", "Giridih", "Ramgarh", "Khunti"
       ]
@@ -931,31 +1151,83 @@ export const WhatsAppSimulatorModal: React.FC = () => {
       {/* WhatsApp Window Container */}
       <div className="bg-[#efeae2] rounded-2xl shadow-2xl border border-slate-300 w-full max-w-lg h-[640px] max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
         {/* 1. Official WhatsApp Header */}
-        <div className="bg-[#075e54] text-white px-4 py-3 flex items-center justify-between shadow-md select-none shrink-0">
-          <div className="flex items-center space-x-3">
+        <div className="bg-[#075e54] text-white px-3 sm:px-4 py-2.5 flex items-center justify-between shadow-md select-none shrink-0">
+          <div className="flex items-center space-x-2.5 sm:space-x-3">
             <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-emerald-950 border-2 border-emerald-400 flex items-center justify-center text-white font-bold text-sm shadow">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-950 border-2 border-emerald-400 flex items-center justify-center text-white font-bold text-sm shadow">
                 🇮🇳
               </div>
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-[#075e54] rounded-full"></span>
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-400 border-2 border-[#075e54] rounded-full"></span>
             </div>
             <div>
               <div className="flex items-center space-x-1.5">
-                <h3 className="font-bold text-sm text-white tracking-wide">
+                <h3 className="font-bold text-xs sm:text-sm text-white tracking-wide">
                   Jharkhand Sahayak
                 </h3>
-                <span className="bg-emerald-400/20 text-emerald-300 text-[10px] font-extrabold px-1.5 py-0.2 rounded-full border border-emerald-400/40">
+                <span className="bg-emerald-400/20 text-emerald-300 text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.2 rounded-full border border-emerald-400/40">
                   ✓ VERIFIED
                 </span>
               </div>
-              <p className="text-[11px] text-emerald-100 flex items-center space-x-1">
+              <p className="text-[10px] sm:text-[11px] text-emerald-100 flex items-center space-x-1">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-                <span>online • SIH 2026 AI Grievance Bot ({chatLang.toUpperCase()})</span>
+                <span>online • SIH 2026 AI Grievance Bot ({LANG_CONFIG[chatLang].badge})</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 text-emerald-100">
+          <div className="flex items-center space-x-1.5 sm:space-x-2 text-emerald-100">
+            {/* Quick 4-Language Switcher Pills in WhatsApp Header */}
+            <div className="flex items-center bg-emerald-950/60 rounded-lg p-0.5 border border-emerald-400/30 text-[10px] font-semibold">
+              <button
+                type="button"
+                onClick={() => setChatLang("en")}
+                className={`px-1.5 py-0.5 rounded transition ${
+                  chatLang === "en"
+                    ? "bg-emerald-500 text-white font-bold shadow-xs"
+                    : "text-emerald-200 hover:text-white"
+                }`}
+                title="Switch to English"
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setChatLang("hi")}
+                className={`px-1.5 py-0.5 rounded transition ${
+                  chatLang === "hi"
+                    ? "bg-emerald-500 text-white font-bold shadow-xs"
+                    : "text-emerald-200 hover:text-white"
+                }`}
+                title="हिन्दी (Hindi)"
+              >
+                हिन्दी
+              </button>
+              <button
+                type="button"
+                onClick={() => setChatLang("nagpuri")}
+                className={`px-1.5 py-0.5 rounded transition ${
+                  chatLang === "nagpuri"
+                    ? "bg-emerald-500 text-white font-bold shadow-xs"
+                    : "text-emerald-200 hover:text-white"
+                }`}
+                title="नागपुरी (Nagpuri)"
+              >
+                नागपुरी
+              </button>
+              <button
+                type="button"
+                onClick={() => setChatLang("santali")}
+                className={`px-1.5 py-0.5 rounded transition ${
+                  chatLang === "santali"
+                    ? "bg-emerald-500 text-white font-bold shadow-xs"
+                    : "text-emerald-200 hover:text-white"
+                }`}
+                title="ᱥᱟᱱᱛᱟᱲᱤ (Santhali)"
+              >
+                ᱥᱟᱱᱛᱟᱲᱤ
+              </button>
+            </div>
+
             <button
               onClick={handleReset}
               title="Restart Conversation"
@@ -989,44 +1261,148 @@ export const WhatsAppSimulatorModal: React.FC = () => {
             </div>
           </div>
 
-          {/* User Requested: Starting me chatbot koi message nahi bhejega. Show friendly clean launcher until user initiates. */}
+          {/* Clean Interactive Launcher with Regional Languages Support */}
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center p-6 space-y-4 my-auto">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center text-3xl shadow-inner">
+            <div className="flex flex-col items-center justify-center h-full text-center p-3 sm:p-5 space-y-3 my-auto">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-2xl shadow-inner">
                 💬
               </div>
-              <div className="space-y-1 max-w-xs">
+              <div className="space-y-1 max-w-sm">
                 <h4 className="font-bold text-slate-800 text-sm">
-                  {chatLang === "hi" ? "झारखंड सहायक 24/7 AI चैट" : "Jharkhand Sahayak AI Grievance Bot"}
+                  {LANG_CONFIG[chatLang].botTitle}
                 </h4>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  {chatLang === "hi"
-                    ? "बातचीत शुरू करने के लिए कोई विकल्प चुनें या नीचे सीधे अपनी भाषा (हिंदी/Hinglish/English) में मैसेज या वॉइस नोट भेजें:"
-                    : "Select a starter option below or directly type your problem or send a voice note in your preferred language:"}
+                  {LANG_CONFIG[chatLang].starterHint}
                 </p>
               </div>
-              <div className="w-full max-w-xs space-y-2 pt-2">
+
+              {/* Language Selection Chips */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5 py-0.5">
                 <button
-                  onClick={() => handleSendMessage(chatLang === "hi" ? "1. नई समस्या दर्ज करें" : "1. Report New Problem")}
-                  className="w-full bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl py-2.5 px-3 text-xs font-semibold text-left flex items-center justify-between shadow-xs transition"
+                  type="button"
+                  onClick={() => setChatLang("en")}
+                  className={`px-2.5 py-1 rounded-full text-[10.5px] font-semibold transition border ${
+                    chatLang === "en"
+                      ? "bg-emerald-600 text-white border-emerald-700 shadow-xs"
+                      : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                  }`}
                 >
-                  <span>📝 {chatLang === "hi" ? "नई समस्या दर्ज करें" : "Report New Problem"}</span>
+                  🌐 English
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChatLang("hi")}
+                  className={`px-2.5 py-1 rounded-full text-[10.5px] font-semibold transition border ${
+                    chatLang === "hi"
+                      ? "bg-emerald-600 text-white border-emerald-700 shadow-xs"
+                      : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  🇮🇳 हिन्दी
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChatLang("nagpuri")}
+                  className={`px-2.5 py-1 rounded-full text-[10.5px] font-semibold transition border ${
+                    chatLang === "nagpuri"
+                      ? "bg-emerald-600 text-white border-emerald-700 shadow-xs"
+                      : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  🌾 नागपुरी (Nagpuri)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChatLang("santali")}
+                  className={`px-2.5 py-1 rounded-full text-[10.5px] font-semibold transition border ${
+                    chatLang === "santali"
+                      ? "bg-emerald-600 text-white border-emerald-700 shadow-xs"
+                      : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  🏹 संथाली (ᱥᱟᱱᱛᱟᱲᱤ)
+                </button>
+              </div>
+
+              {/* Starter Action Buttons */}
+              <div className="w-full max-w-xs space-y-1.5 pt-0.5">
+                <button
+                  onClick={() => handleSendMessage(`1. ${LANG_CONFIG[chatLang].optReport}`)}
+                  className="w-full bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl py-2 px-3 text-xs font-semibold text-left flex items-center justify-between shadow-xs transition"
+                >
+                  <span>📝 {LANG_CONFIG[chatLang].optReport}</span>
                   <span className="text-emerald-500">&rarr;</span>
                 </button>
                 <button
-                  onClick={() => handleSendMessage(chatLang === "hi" ? "2. कंप्लेंट प्रोग्रेस देखें" : "2. Check Complaint Progress")}
-                  className="w-full bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl py-2.5 px-3 text-xs font-semibold text-left flex items-center justify-between shadow-xs transition"
+                  onClick={() => handleSendMessage(`2. ${LANG_CONFIG[chatLang].optCheck}`)}
+                  className="w-full bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl py-2 px-3 text-xs font-semibold text-left flex items-center justify-between shadow-xs transition"
                 >
-                  <span>📊 {chatLang === "hi" ? "कंप्लेंट प्रोग्रेस देखें" : "Check Complaint Progress"}</span>
+                  <span>📊 {LANG_CONFIG[chatLang].optCheck}</span>
                   <span className="text-emerald-500">&rarr;</span>
                 </button>
                 <button
-                  onClick={() => handleSendMessage(chatLang === "hi" ? "3. मदद एवं जानकारी" : "3. Help & Information")}
-                  className="w-full bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl py-2.5 px-3 text-xs font-semibold text-left flex items-center justify-between shadow-xs transition"
+                  onClick={() => handleSendMessage(`3. ${LANG_CONFIG[chatLang].optHelp}`)}
+                  className="w-full bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-xl py-2 px-3 text-xs font-semibold text-left flex items-center justify-between shadow-xs transition"
                 >
-                  <span>ℹ️ {chatLang === "hi" ? "मदद एवं जानकारी" : "Help & Information"}</span>
+                  <span>ℹ️ {LANG_CONFIG[chatLang].optHelp}</span>
                   <span className="text-emerald-500">&rarr;</span>
                 </button>
+              </div>
+
+              {/* Interactive Regional Voice Note Test Buttons */}
+              <div className="w-full max-w-xs pt-2 border-t border-slate-300/80">
+                <span className="text-[10px] uppercase tracking-wider font-bold text-slate-600 block mb-1 text-center">
+                  🎙️ Test Regional Voice Grievance (1-Tap Demo):
+                </span>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setChatLang("nagpuri");
+                      const nagText = "हमार गाँव में चापाकल खराब हवे, 15 दिन से पानी नइखे मिलत, सब कोई परेशान बा";
+                      const voiceMsg: ChatMessage = {
+                        id: `msg-${Date.now()}`,
+                        sender: "user",
+                        text: nagText,
+                        time: getCurrentTime(),
+                        isVoiceNote: true,
+                        voiceDuration: "0:05"
+                      };
+                      setMessages([voiceMsg]);
+                      setTimeout(() => {
+                        handleSendMessage(nagText);
+                      }, 300);
+                    }}
+                    className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-[10px] font-semibold text-left leading-tight transition shadow-2xs"
+                  >
+                    <span className="block font-bold">🌾 नागपुरी Voice</span>
+                    <span className="text-[9px] text-amber-700 truncate block">"चापाकल खराब हवे..."</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setChatLang("santali");
+                      const satText = "ᱟᱞᱮᱭᱟᱜ ᱟᱹᱛᱩ ᱨᱮ ᱫᱟᱜ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱢᱮᱱᱟᱜᱼᱟ, ᱦᱚᱨ ᱵᱟᱹᱲᱤᱡ ᱜᱮᱭᱟ (Aleyag aatu re daah etketone menaga)";
+                      const voiceMsg: ChatMessage = {
+                        id: `msg-${Date.now()}`,
+                        sender: "user",
+                        text: satText,
+                        time: getCurrentTime(),
+                        isVoiceNote: true,
+                        voiceDuration: "0:06"
+                      };
+                      setMessages([voiceMsg]);
+                      setTimeout(() => {
+                        handleSendMessage(satText);
+                      }, 300);
+                    }}
+                    className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] font-semibold text-left leading-tight transition shadow-2xs"
+                  >
+                    <span className="block font-bold">🏹 ᱥᱟᱱᱛᱟᱲᱤ Voice</span>
+                    <span className="text-[9px] text-emerald-700 truncate block">"ᱫᱟᱜ ᱮᱴᱠᱮᱴᱚᱬᱮ..."</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -1252,7 +1628,7 @@ export const WhatsAppSimulatorModal: React.FC = () => {
               <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce delay-100"></span>
               <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce delay-200"></span>
               <span className="text-[10px] text-slate-500 ml-1">
-                {chatLang === "hi" ? "झारखंड सहायक टाइप कर रहा है..." : "Jharkhand Sahayak is typing..."}
+                {LANG_CONFIG[chatLang].typingNotice}
               </span>
             </div>
           )}
@@ -1270,14 +1646,20 @@ export const WhatsAppSimulatorModal: React.FC = () => {
                 className="w-10 h-10 object-cover rounded border border-slate-300"
               />
               <span className="text-xs text-slate-700 font-medium">
-                {chatLang === "hi" ? "फोटो भेजने के लिए तैयार" : "Photo ready to send with message"}
+                {chatLang === "santali"
+                  ? "ᱯᱷᱚᱴᱚ ᱠᱩᱞ ᱞᱟᱹᱜᱤᱫ ᱥᱟᱯᱲᱟᱣ"
+                  : chatLang === "nagpuri"
+                  ? "फोटो भेजेक ले तैयार बा"
+                  : chatLang === "hi"
+                  ? "फोटो भेजने के लिए तैयार"
+                  : "Photo ready to send with message"}
               </span>
             </div>
             <button
               onClick={() => setAttachedImage(null)}
               className="text-rose-600 hover:text-rose-800 text-xs font-bold"
             >
-              {chatLang === "hi" ? "हटाएं" : "Remove"}
+              {chatLang === "santali" ? "ᱜᱤᱰᱤ ᱠᱟᱜ ᱢᱮ" : chatLang === "nagpuri" ? "हटाऊ" : chatLang === "hi" ? "हटाएं" : "Remove"}
             </button>
           </div>
         )}
@@ -1295,7 +1677,7 @@ export const WhatsAppSimulatorModal: React.FC = () => {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            title={chatLang === "hi" ? "फोटो संलग्न करें" : "Attach Photo"}
+            title={chatLang === "santali" ? "ᱯᱷᱚᱴᱚ ᱡᱚᱲᱟᱣ ᱢᱮ" : chatLang === "nagpuri" ? "फोटो संलग्न करूं" : chatLang === "hi" ? "फोटो संलग्न करें" : "Attach Photo"}
             className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-full transition"
           >
             <Paperclip className="w-5 h-5" />
@@ -1305,7 +1687,7 @@ export const WhatsAppSimulatorModal: React.FC = () => {
           <button
             type="button"
             onClick={() => setCameraModalOpen(true)}
-            title={chatLang === "hi" ? "कैमरे से फोटो लें" : "Take Photo with Camera"}
+            title={chatLang === "santali" ? "ᱠᱮᱢᱮᱨᱟ ᱛᱮ ᱯᱷᱚᱴᱚ ᱛᱩᱞᱟᱹᱣ ᱢᱮ" : chatLang === "nagpuri" ? "कैमरा से फोटो लेवूं" : chatLang === "hi" ? "कैमरे से फोटो लें" : "Take Photo with Camera"}
             className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-full transition"
           >
             <Camera className="w-5 h-5" />
@@ -1318,7 +1700,7 @@ export const WhatsAppSimulatorModal: React.FC = () => {
               <button
                 type="button"
                 onClick={cancelVoiceRecording}
-                title={chatLang === "hi" ? "रद्द करें" : "Cancel Recording"}
+                title={chatLang === "santali" ? "ᱵᱟᱹᱛᱤᱞ ᱢᱮ" : chatLang === "nagpuri" ? "रद्द करूं" : chatLang === "hi" ? "रद्द करें" : "Cancel Recording"}
                 className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition shrink-0"
               >
                 <Trash2 className="w-4 h-4" />
@@ -1334,6 +1716,11 @@ export const WhatsAppSimulatorModal: React.FC = () => {
                   00:{recordingSeconds < 10 ? `0${recordingSeconds}` : recordingSeconds}
                 </span>
               </div>
+
+              {/* Language pill during recording */}
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 hidden sm:inline">
+                🎙️ {LANG_CONFIG[chatLang].nativeName}
+              </span>
 
               {/* Center: Realistic WhatsApp Audio Waveform bars */}
               <div className="flex-1 flex items-center justify-center space-x-1 px-2 h-6 overflow-hidden">
@@ -1355,7 +1742,7 @@ export const WhatsAppSimulatorModal: React.FC = () => {
               <button
                 type="button"
                 onClick={stopAndProcessVoiceRecording}
-                title={chatLang === "hi" ? "वॉइस नोट भेजें" : "Send Voice Note"}
+                title={chatLang === "santali" ? "ᱟᱲᱟᱝ ᱠᱩᱞ ᱢᱮ" : chatLang === "nagpuri" ? "वॉइस नोट भेजूं" : chatLang === "hi" ? "वॉइस नोट भेजें" : "Send Voice Note"}
                 className="p-2 bg-[#00a884] hover:bg-[#069475] text-white rounded-full transition shadow hover:scale-105 flex items-center justify-center shrink-0"
               >
                 <Send className="w-4 h-4" />
@@ -1372,12 +1759,30 @@ export const WhatsAppSimulatorModal: React.FC = () => {
                 }}
                 placeholder={
                   conversationStep === "SELECT_THEME"
-                    ? chatLang === "hi" ? "नीचे से थीम चुनें या टाइप करें..." : "Select or type your theme..."
+                    ? chatLang === "santali"
+                      ? "ᱛᱷᱤᱢ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ..."
+                      : chatLang === "nagpuri"
+                      ? "नीचे से थीम चुनू या लिखू..."
+                      : chatLang === "hi"
+                      ? "नीचे से थीम चुनें या टाइप करें..."
+                      : "Select or type your theme..."
                     : conversationStep === "SELECT_DISTRICT"
-                    ? chatLang === "hi" ? "अपना ज़िला चुनें या लिखें..." : "Type or click your district..."
+                    ? chatLang === "santali"
+                      ? "ᱡᱤᱞᱟᱹ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ..."
+                      : chatLang === "nagpuri"
+                      ? "अपन ज़िला चुनू या लिखू..."
+                      : chatLang === "hi"
+                      ? "अपना ज़िला चुनें या लिखें..."
+                      : "Type or click your district..."
                     : conversationStep === "SELECT_BLOCK"
-                    ? chatLang === "hi" ? "अपना प्रखंड चुनें या लिखें..." : "Type or click your block..."
-                    : chatLang === "hi" ? "अपनी समस्या हिंदी या English में लिखें..." : "Type your problem in Hindi / English..."
+                    ? chatLang === "santali"
+                      ? "ᱯᱨᱚᱠᱷᱚᱸᱰ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱥᱮ ᱚᱞ ᱢᱮ..."
+                      : chatLang === "nagpuri"
+                      ? "अपन प्रखंड चुनू या लिखू..."
+                      : chatLang === "hi"
+                      ? "अपना प्रखंड चुनें या लिखें..."
+                      : "Type or click your block..."
+                    : LANG_CONFIG[chatLang].placeholder
                 }
                 className="flex-1 bg-white border border-slate-300 rounded-full px-4 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#075e54]"
               />
@@ -1397,9 +1802,13 @@ export const WhatsAppSimulatorModal: React.FC = () => {
                   type="button"
                   onClick={startRealVoiceRecording}
                   title={
-                    chatLang === "hi"
-                      ? "माइक दबाकर अपनी आवाज में बोलें"
-                      : "Click to speak your problem"
+                    chatLang === "santali"
+                      ? "ᱢᱟᱭᱤᱠ ᱚᱛᱟ ᱠᱟᱛᱮ ᱥᱟᱱᱛᱟᱲᱤ ᱛᱮ ᱨᱚᱲ ᱢᱮ"
+                      : chatLang === "nagpuri"
+                      ? "माइक दबा के नागपुरी, हिंदी या संथाली में बोलू"
+                      : chatLang === "hi"
+                      ? "माइक दबाकर हिंदी, नागपुरी या संथाली में बोलें"
+                      : "Click to speak in Nagpuri, Santhali, Hindi or English"
                   }
                   className="p-2.5 rounded-full transition shadow bg-[#00a884] hover:bg-[#069475] text-white hover:scale-105"
                 >

@@ -215,13 +215,17 @@ export const DOMAIN_KEYWORDS: Record<ProblemCategory, string[]> = {
     "drinking water", "water supply", "supply", "ganda pani", "turbid", "fluoride", "arsenic", "contamination",
     "dry borewell", "well", "kuan", "kua", "कुआं", "chapakal", "chaapaakal", "चापाकल", "boring", "motor", "pond", "talab",
     "nehar", "canal", "nadi", "river", "kachra", "kachda", "garbage", "waste", "drainage", "nali", "naali", "naala", "nala",
-    "sanitation", "sewer", "sewage", "gutter", "toilet", "shauchalay", "safai", "gandagi", "leakage", "leak", "tanker"
+    "sanitation", "sewer", "sewage", "gutter", "toilet", "shauchalay", "safai", "gandagi", "leakage", "leak", "tanker",
+    // Nagpuri & Santhali terms
+    "daah", "dạh", "ᱫᱟᱜ", "दाः", "पानी नइखे", "पानी नईखे", "चापाकल खराब", "कुआं सुखल", "डोंभा", "पोखरा", "daah bano", "daah bano'a", "ganda daah", "daah etketone"
   ],
   "Rural Infrastructure & Transport": [
     "road", "sadak", "सड़क", "rasta", "raasta", "मार्ग", "pothole", "potholes", "gaddha", "गड्ढा", "gaddhe", "गड्ढे",
     "khadda", "khadde", "खड्डे", "खड्डा", "broken road", "bridge", "pul", "पुल", "puliya", "culvert", "causeway",
     "accident", "transport", "bus", "auto", "gaadi", "yaatayat", "road damage", "tooti sadak",
-    "traffic", "connectivity", "highway", "bypass", "erosion", "dhasan"
+    "traffic", "connectivity", "highway", "bypass", "erosion", "dhasan",
+    // Nagpuri & Santhali terms
+    "सड़क टूट गेल", "रास्ता खराब", "डहर", "डहर खराब", "गाढ़ा", "पुलिया बह गेल", "hor", "dahar", "ᱦᱚᱨ", "होर", "dahar baadi", "hor rapud", "kulhi", "hor baadi"
   ],
   "Healthcare & MedTech": [
     "health", "hospital", "aspatal", "अस्पताल", "doctor", "dr", "nurse", "medicine", "dawai", "दवाई", "dawa", "दवा",
@@ -230,13 +234,17 @@ export const DOMAIN_KEYWORDS: Record<ProblemCategory, string[]> = {
     "disease", "bimari", "bimar", "bimaar", "beemar", "beemari", "बीमार", "बीमारी", "rog", "weakness", "kamzori", "kamjori",
     "kamzor", "कमजोरी", "sick", "sickness", "ill", "illness", "tabiyat", "unwell", "dast", "diarrhea", "vomit", "ulti",
     "pet dard", "sir dard", "headache", "pain", "dard", "cough", "khansi", "anemia", "kuposhan", "malnutrition",
-    "poshan", "treatment", "ilaj", "elaj", "इलाज", "upchar", "vaccine", "teeka", "teekakaran"
+    "poshan", "treatment", "ilaj", "elaj", "इलाज", "upchar", "vaccine", "teeka", "teekakaran",
+    // Nagpuri & Santhali terms
+    "बेमार", "दवाइ नईखे", "अस्पताल में डाक्टर नइखन", "पेट पीरा", "तबीयत खराब", "rua", "ruạ", "ᱨᱩᱣᱟᱹ", "रुअ", "haspatal", "ran bano", "ran", "ᱨᱟᱱ", "dactor", "lai haso"
   ],
   "Agriculture & Allied Technologies": [
     "kheti", "kheti badi", "kisan", "farmer", "agriculture", "krishi", "कृषि", "crop", "crops", "fasal", "fashal", "फसल",
     "dhan", "paddy", "gehun", "wheat", "irrigation", "sinchai", "सिंचाई", "drip irrigation", "sprinkler", "canal", "pump",
     "soil", "mitti", "pest", "keeda", "keede", "fertilizer", "khad", "urea", "drought", "sukha", "harvest", "yield",
-    "upaj", "cold storage", "mandi", "seeds", "beej", "बीज", "livestock", "pashu", "dairy", "poultry"
+    "upaj", "cold storage", "mandi", "seeds", "beej", "बीज", "livestock", "pashu", "dairy", "poultry",
+    // Nagpuri & Santhali terms
+    "फसल सूख गेल", "खेत", "सुखाड़", "पटवन", "बीया", "खाद नइखे", "कीड़ा लगल", "chas", "chasa", "ᱪᱟᱥ", "khasa", "khet", "gachi", "rohor", "chas baadi"
   ],
   "Renewable Energy & Off-Grid Power": [
     "electricity", "bijli", "बिजली", "power", "power cut", "load shedding", "transformer", "transfomer", "solar",
@@ -244,7 +252,9 @@ export const DOMAIN_KEYWORDS: Record<ProblemCategory, string[]> = {
     "voltage", "low voltage", "fluctuation", "current", "off-grid", "sparking", "short circuit", "battery", "inverter",
     "street light", "streetlight", "street lights", "streetlights", "light", "lights", "bulb", "tube light", "tubelight",
     "led", "batti", "battiyan", "roshni", "solar street light", "street light kharab", "light kharab", "khambha",
-    "खंभा", "तार", "लाइन", "अंधेरा", "रोशनी", "power failure", "blackout", "line cut", "substation", "meter"
+    "खंभा", "तार", "लाइन", "अंधेरा", "रोशनी", "power failure", "blackout", "line cut", "substation", "meter",
+    // Nagpuri & Santhali terms
+    "बिजुली गुल", "बिजली नईखे", "ट्रांसफार्मर जर गेल", "तार टूट गेल", "अंधरिया", "बत्ती", "bati", "bijuli", "ᱵᱟᱹᱛᱤ", "marsal bano", "nut", "light bano'a", "bijli bano"
   ],
   "Environment & Mining Remediation": [
     "mining", "mine", "mines", "khadan", "खदान", "coal", "koyla", "कोयला", "methane", "smoke", "dhuand", "dhuaan", "धुआं",
@@ -256,13 +266,17 @@ export const DOMAIN_KEYWORDS: Record<ProblemCategory, string[]> = {
     "school", "college", "vidyalaya", "विद्यालय", "shiksha", "शिक्षा", "education", "school building", "teacher", "shikshak",
     "शिक्षक", "master ji", "guru ji", "principal", "padhai", "study", "classroom", "class", "kaksha", "desk", "bench",
     "blackboard", "computer lab", "computer", "student", "students", "bacche", "chhatra", "छात्र", "dropout", "attendance",
-    "books", "kitab", "midday meal", "mdm", "smart class", "school toilet"
+    "books", "kitab", "midday meal", "mdm", "smart class", "school toilet",
+    // Nagpuri & Santhali terms
+    "मास्टर नइखन आवत", "स्कूल बंद", "पढ़ाई नइखे होत", "किताब नइखे", "खिचड़ी", "ischool", "ol itun asul", "ᱤᱥᱠᱩᱞ", "ᱚᱞ ᱤᱛᱩᱱ ᱟᱥᱲᱟ", "guru gomke", "ol", "padhao"
   ],
   "Forest & Tribal Livelihoods": [
     "tribal", "forest", "jungle", "adivasi", "aadivasi", "आदिवासी", "munda", "santhal", "oraon", "ho", "van", "vanopaj",
     "minor forest produce", "mfp", "mahua", "महुआ", "lac", "लाह", "tussar", "silk", "kendupatta", "sal", "chironji",
     "honey", "madhu", "bamboo", "baans", "livelihood", "rozgar", "kamai", "artisan", "karigar", "handicraft", "handloom",
-    "shg", "swayam sahayata", "sakhi mandal", "self help group", "women cooperative"
+    "shg", "swayam sahayata", "sakhi mandal", "self help group", "women cooperative",
+    // Nagpuri & Santhali terms
+    "महुआ", "लाह", "दतून", "पत्तल", "हाट", "रोजगार", "bir", "ᱵᱤᱨ", "बीर", "hor hopon", "ᱦᱚᱲ ᱦᱚᱯᱚᱱ", "matkom", "sarjom", "dare"
   ]
 };
 

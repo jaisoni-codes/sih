@@ -54,11 +54,8 @@ export const LandingPage: React.FC = () => {
               </div>
 
               <h1 className="font-heading font-extrabold text-2xl sm:text-3xl lg:text-4xl text-[#0f2942] tracking-tight leading-tight">
-                झारखंड सामाजिक नवाचार सहयोग पोर्टल
+                {t("landing_title")}
               </h1>
-              <h2 className="font-heading font-bold text-lg sm:text-xl text-slate-700">
-                Jharkhand Societal Innovation Collaboration Portal (JSICP)
-              </h2>
 
               <p className="text-slate-600 text-sm leading-relaxed max-w-2xl">
                 {t("landing_desc")}
